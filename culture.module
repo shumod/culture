@@ -56,6 +56,15 @@ function culture_menu() {
     'type' => MENU_NORMAL_ITEM,
   ); 
 
+
+  //локали
+  $items['reload-locales'] = array(
+    'title' => 'Обновление списка локалей',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('locales_form'),
+    'access arguments' => array('administer site configuration'),
+  );
+
   return $items;
 }
 
@@ -84,7 +93,7 @@ function culture_theme() {
       'template' => 'templates/event',
     ),
 
-    //темплейт для страницы события
+    //темплейт для страницы организации
     'organization' => array(
       'variables' => array(
         'title' => NULL,
@@ -257,4 +266,85 @@ function _format_phone($phone = '', $convert = false, $trim = true){
 
   // Return original phone if not 7, 10 or 11 digits long
   return $phone;
+}
+
+
+function locales_form($form, &$form_state){
+
+  $form = array();
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Начать обновление',
+  );
+
+  return $form;
+}
+
+function locales_form_submit($form, &$form_state){
+
+  dsm($form);
+
+  //если такого словаря нет, то создаём его
+  if (!taxonomy_vocabulary_machine_name_load('locales')) {
+    $vocabulary = array(
+      'machine_name' => 'locales',
+      'name' => 'Локали',
+    );
+    $vocabulary = (object) $vocabulary;
+    taxonomy_vocabulary_save($vocabulary);
+    $vid = $vocabulary->vid;
+  }
+  else{
+    $vid = taxonomy_vocabulary_machine_name_load('locales')->vid;
+  }
+
+  //формируем массив всех локалей. за один раз получать можно только 1000 локалей
+  $total_url = 'http://all.culture.ru/api/1.0/locales?limit=1';
+
+  $total = _decode($total_url)->total;
+
+  $operations = array();
+  for($i = 0; $i < 10; $i++){
+    $operations[] = array('reload_taxonomy_locale_term', array($vid));
+  }
+
+  $batch = array(
+    // Массив операций и их параметров
+    'operations' => $operations,
+    // Функция, которая будет выполнена после окончания всех операций
+    'finished' => 'locale_batch_finished',
+    // Заголовок страницы с прогресс баром.
+    // Опционально, по умолчанию t('Processing')
+    'title' => 'Обновление терминов таксономии',
+    // Сообщение, показываемое при инициализации.
+    // Опционально, по умолчанию t('Initializing.')
+    'init_message' => 'Подготовка данных',
+    // Сообщение, показывемое при выполнении операций.
+    // Опционально, по умолчанию t('Completed @current of @total.')
+    'progress_message' => 'Выполнено @current из @total.',
+    // Сообщение показываемое при ошибке выполнения операции.
+    // Опционально, по умолчанию t('An error has occurred.')
+    'error_message' => 'Произошла ошибка.',
+  );
+
+  batch_set($batch);
+
+}
+
+function reload_taxonomy_locale_term($vid, &$context) {
+  // Сообщение выводимое под прогресс баром после окончания текущей операции
+  $context['message'] = $vid;
+  $context['results'][] = $vid;
+}
+
+function locale_batch_finished($success, $results, $operations) {
+  if ($success) {
+    dsm($results);
+    dsm($operations);
+    drupal_set_message('Обновлена дата у ' . count($results) . ' материалов:' . theme('item_list', array('items' => $results)));
+  }
+  else {
+    drupal_set_message('Завершено с ошибками.', 'error');
+  }
 }

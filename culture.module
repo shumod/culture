@@ -1,0 +1,259 @@
+<?php
+
+/**
+ * Implements hook_menu().
+ */
+function culture_menu() {
+ 
+  //места
+  $items['places'] = array(
+    'title' => 'Места',
+    'page callback' => '_places',
+    'access arguments' => array('administer site configuration'),
+    'file' => 'inc/places.culture.inc',  
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['places/%'] = array(
+    'page callback' => '_place',
+    'page arguments' => array(1),
+    'access arguments' => array('administer site configuration'),
+    'file' => 'inc/places.culture.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  //события
+  $items['events'] = array(
+    'title' => 'События',
+    'page callback' => '_events',
+    'access arguments' => array('administer site configuration'),
+    'file' => 'inc/events.culture.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['events/%'] = array(
+    'page callback' => '_event',
+    'page arguments' => array(1),
+    'access arguments' => array('administer site configuration'),
+    'file' => 'inc/events.culture.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  //организации
+  $items['organizations'] = array(
+    'title' => 'Организации',
+    'page callback' => '_organizations',
+    'access arguments' => array('administer site configuration'),
+    'file' => 'inc/organizations.culture.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['organizations/%'] = array(
+    'page callback' => '_organization',
+    'page arguments' => array(1),
+    'access arguments' => array('administer site configuration'),
+    'file' => 'inc/organizations.culture.inc',
+    'type' => MENU_NORMAL_ITEM,
+  ); 
+
+  return $items;
+}
+
+/**
+ * Implements hook_theme.
+ */
+function culture_theme() {
+  return array(
+
+    //темплейт для страницы места
+    'place' => array(
+      'variables' => array(
+        'title' => NULL,
+        'address' => NULL,
+        'image' => NULL,
+        'description' => NULL,
+      ),
+      'template' => 'templates/place',
+    ),
+
+    //темплейт для страницы события
+    'event' => array(
+      'variables' => array(
+        'title' => NULL,
+      ),
+      'template' => 'templates/event',
+    ),
+
+    //темплейт для страницы события
+    'organization' => array(
+      'variables' => array(
+        'title' => NULL,
+      ),
+      'template' => 'templates/organization',
+    ),
+
+  );
+}
+
+function _pager($total){
+  //pager
+  $per_page = 20;
+  $elements_count = $total;
+  // Initialize the pager
+  $current_page = pager_default_initialize($elements_count, $per_page);
+  // Show the pager
+  $pager = theme('pager', array('quantity', $elements_count));
+
+  return $pager;
+}
+
+function _decode($url){
+
+  //для пейджера
+  $data_arr = array();
+  if(isset($_GET['page'])){
+    $offset = $_GET['page']*20;
+    $data_arr[] = 'offset='.$offset;
+  }
+
+  $data = (sizeof($data_arr) > 0) ? implode('&', $data_arr) : NULL ;
+
+  $options = array(
+    'method' => 'GET',
+    'data' => $data,
+    'timeout' => 15,
+    'headers' => array('Content-Type' => 'application/x-www-form-urlencoded'),
+  );
+  $result = drupal_http_request($url, $options);
+
+  $decode = json_decode($result->data);
+
+  dsm($decode);
+  return $decode;
+}
+
+//формирует список тэгов
+function _tags($tags_array){
+  $tags = array();
+  foreach ($tags_array as $key => $value) {
+    $tags[] = l($value->name, 'tags/'.$value->_id);
+  }
+  $output = (sizeof($tags) > 0) ? 'Тэги: '.implode(', ', $tags) : '';
+  
+  return $output;
+}
+
+//формирует список контактов из полученного массива
+function _contacts($contacts_array){
+  $items = array();
+  if (isset($contacts_array->website)) {
+    $items[] = 'Официальный сайт: <a href="' . $contacts_array->website . '" target="_blank">'.$contacts_array->website.'</a>';
+  }
+  if (isset($contacts_array->phones)) {
+    foreach ($contacts_array->phones as $phone) {
+      $comment = ($phone->comment != '') ? ' ('.$phone->comment.')' : '' ;
+      $items[] = _format_phone($phone->value) . $comment;
+    }
+  }
+
+  $output = (sizeof($items) > 0) ? 'Контакты: '.theme('item_list', array('items' => $items)) : '' ;
+
+  return $output;
+}
+
+//выводим расписание работы
+function _schedule($schedule){
+  $output = '';
+  $days = array('Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье');
+  $items = array();
+  $minus = 9 * 60 * 60; //сколько вычест часов, чтобы получить нормальное время
+  dsm($schedule);
+  foreach ($schedule as $key => $value) {
+    $from = date("H:i", (int) $value->from / 1000 - 3*60*60);
+    $to = date("H:i", (int) $value->to / 1000 - 3*60*60);
+
+    dsm($to);
+    $items[] = $days[$key] . ': '.$from. ' - ' . $to;
+  }
+
+  $output = (sizeof($items) > 0) ? 'Время работы: '.theme('item_list', array('items' => $items)) : '' ; 
+
+  return $output;
+}
+
+function _map($coordinateX, $coordinateY, $hint, $baloon){
+  drupal_add_js('https://api-maps.yandex.ru/2.1/?lang=ru_RU', 'external');
+  drupal_add_js('
+      ymaps.ready(init);
+        var myMap,
+            myPlacemark;
+
+        function init(){     
+            myMap = new ymaps.Map("map", {
+                center: ['.$coordinateX.', '.$coordinateY.'],
+                zoom: 12
+            });
+
+            myPlacemark = new ymaps.Placemark(['.$coordinateX.', '.$coordinateY.'], { 
+                hintContent: "'.$hint.'", 
+                balloonContent: "'.$baloon.'" 
+            });
+
+            myMap.geoObjects.add(myPlacemark);
+        }
+  ', array('type' => 'inline', 'scope' => 'footer', 'weight' => 5));
+
+  $output = '<div id="map" style="width: 600px; height: 400px"></div>';
+  return $output;
+}
+
+//форматирует номер телефона
+function _format_phone($phone = '', $convert = false, $trim = true){
+  // If we have not entered a phone number just return empty
+  if (empty($phone)) {
+    return '';
+  }
+
+  // Strip out any extra characters that we do not need only keep letters and numbers
+  $phone = preg_replace("/[^0-9A-Za-z]/", "", $phone);
+
+  // Do we want to convert phone numbers with letters to their number equivalent?
+  // Samples are: 1-800-TERMINIX, 1-800-FLOWERS, 1-800-Petmeds
+  if ($convert == true) {
+    $replace = 
+      array(
+        '2'=>array('a','b','c'),
+        '3'=>array('d','e','f'),
+        '4'=>array('g','h','i'),
+        '5'=>array('j','k','l'),
+        '6'=>array('m','n','o'),
+        '7'=>array('p','q','r','s'),
+        '8'=>array('t','u','v'), 
+        '9'=>array('w','x','y','z')
+      );
+
+    // Replace each letter with a number
+    // Notice this is case insensitive with the str_ireplace instead of str_replace 
+    foreach($replace as $digit=>$letters) {
+      $phone = str_ireplace($letters, $digit, $phone);
+    }
+  }
+
+  // If we have a number longer than 11 digits cut the string down to only 11
+  // This is also only ran if we want to limit only to 11 characters
+  if ($trim == true && strlen($phone)>11) {
+    $phone = substr($phone,  0, 11);
+  } 
+
+  // Perform phone number formatting here
+  if (strlen($phone) == 7) {
+    return preg_replace("/([0-9a-zA-Z]{3})([0-9a-zA-Z]{4})/", "$1-$2", $phone);
+  } elseif (strlen($phone) == 10) {
+    return preg_replace("/([0-9a-zA-Z]{3})([0-9a-zA-Z]{3})([0-9a-zA-Z]{4})/", "($1) $2-$3", $phone);
+  } elseif (strlen($phone) == 11) {
+    return preg_replace("/([0-9a-zA-Z]{1})([0-9a-zA-Z]{3})([0-9a-zA-Z]{3})([0-9a-zA-Z]{4})/", "$1($2) $3-$4", $phone);
+  }
+
+  // Return original phone if not 7, 10 or 11 digits long
+  return $phone;
+}

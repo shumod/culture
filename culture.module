@@ -181,6 +181,7 @@ function _schedule($schedule){
   return $output;
 }
 
+//функция, которая отдаёт карту с точкой в заданных координатах
 function _map($coordinateX, $coordinateY, $hint, $baloon){
   drupal_add_js('https://api-maps.yandex.ru/2.1/?lang=ru_RU', 'external');
   drupal_add_js('

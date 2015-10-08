@@ -295,10 +295,6 @@ function locales_form_submit($form, &$form_state){
     $operations[] = array('reload_taxonomy_locale_term', array($vid));
   }
 
-  foreach (taxonomy_get_tree('3') as $term) {
-    taxonomy_term_delete($term->tid);
-  }
-
   $batch = array(
     // Массив операций и их параметров
     'operations' => $operations,
@@ -337,31 +333,37 @@ function reload_taxonomy_locale_term($vid, &$context) {
 
   $parent = 0;
 
-  $vid = 3;
-
   $term = array(
     'vid' => $vid,
     'name' => $decode->locales[0]->name,
   );
 
   $term = (object) $term;
-  taxonomy_term_save($term);
-  
-  $parent_id = db_select('field_data_field_locales_id', 'lid')
+
+  $term_id = db_select('field_data_field_locales_id', 'lid')
     ->fields('lid', array('entity_id'))
-    ->condition('lid.field_locales_id_value', $decode->locales[0]->parentId)
+    ->condition('lid.field_locales_id_value', $decode->locales[0]->_id)
     ->execute()
     ->fetchField();
-  $parent = ($parent_id == '') ? 0 : $parent_id;
-  
-  $term->field_locales_id['und'][0]['value'] = $decode->locales[0]->_id;
-  $term->field_locales_timezone['und'][0]['value'] = $decode->locales[0]->timezone;
-  $term->parent[0] = $parent;
-  taxonomy_term_save($term);
+
+  //записываем термин только в том случае, если такого ещё нет в базе данных
+  if(!$term_id) {
+    taxonomy_term_save($term);   
+
+    $parent_id = db_select('field_data_field_locales_id', 'lid')
+      ->fields('lid', array('entity_id'))
+      ->condition('lid.field_locales_id_value', $decode->locales[0]->parentId)
+      ->execute()
+      ->fetchField();
+    $parent = ($parent_id == '') ? 0 : $parent_id;
+    
+    $term->field_locales_id['und'][0]['value'] = $decode->locales[0]->_id;
+    $term->field_locales_timezone['und'][0]['value'] = $decode->locales[0]->timezone;
+    $term->parent[0] = $parent;
+    taxonomy_term_save($term);
+  }
 
   $context['results'][] = 'good';
-  
-
 
   // Сообщение выводимое под прогресс баром после окончания текущей операции
   //$context['message'] = $vid;

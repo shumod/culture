@@ -123,8 +123,9 @@ function culture_block_view($delta = '') {
   switch ($delta) {
     case 'culture-region':
       $block['subject'] = 'Выберите регион';
+      //рендерим форму выбора региона
       $block['content'] = drupal_render(drupal_get_form('_select_region_form'));
-      drupal_add_library('system','jquery.cookie');
+      drupal_add_library('system','jquery.cookie'); //добавляем куки, чтобы записать регион
       break;
   }
   return $block;
@@ -178,7 +179,7 @@ function _pager($total){
   return $pager;
 }
 
-function _decode($url){
+function _decode($url, $region = TRUE){
 
   //для пейджера
   $data_arr = array();
@@ -187,7 +188,19 @@ function _decode($url){
     $data_arr[] = 'offset='.$offset;
   }
 
-  $data = (sizeof($data_arr) > 0) ? implode('&', $data_arr) : NULL ;
+  if($region && isset($_COOKIE['region'])){
+    
+    $childrens = taxonomy_get_children($_COOKIE['region']);
+    
+    $children = array();
+
+    foreach ($childrens as $key => $value) {
+      $children[] = $value->field_locales_id['und'][0]['value'];
+    }
+    $data_arr[] = 'locales='.implode(',', $children);
+  }
+
+  $data = (sizeof($data_arr) > 0) ? implode('&', $data_arr) : NULL;
 
   $options = array(
     'method' => 'GET',
@@ -350,7 +363,7 @@ function locales_form_submit($form, &$form_state){
   //формируем массив всех локалей. за один раз получать можно только 1000 локалей
   $total_url = 'http://all.culture.ru/api/1.0/locales?limit=1';
 
-  $total = _decode($total_url)->total;
+  $total = _decode($total_url, FALSE)->total;
 
   $operations = array();
   for($i = 0; $i < $total; $i++){

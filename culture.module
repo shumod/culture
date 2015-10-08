@@ -104,6 +104,91 @@ function culture_theme() {
   );
 }
 
+/**
+ * Implements hook_block_info().
+ */
+function culture_block_info() {
+  $blocks['culture-region'] = array(
+    'info' => 'Блок выбора региона',
+    'cache' => DRUPAL_NO_CACHE,
+  );
+  return $blocks;
+}
+ 
+/**
+ * Implements hook_block_view().
+ */
+function culture_block_view($delta = '') {
+  $block = array();
+  switch ($delta) {
+    case 'culture-region':
+      $block['subject'] = 'Выберите регион';
+      $block['content'] = drupal_render(drupal_get_form('_select_region_form'));
+      drupal_add_library('system','jquery.cookie');
+      dsm($_COOKIE['region']);
+      break;
+  }
+  return $block;
+}
+
+function _select_region_form($form, &$form_state){
+  $form = array();
+
+  $form['region'] = array(
+    '#type' => 'select',
+    '#options' => _get_regions_list(),
+    //'#default_value' => 1,
+    '#ajax' => array(
+      'callback' => '_set_region_cookie',
+      'wrapper' => 'region-cookies',
+      'method' => 'replace',
+      'effect' => 'fade',
+    ),
+  );
+  
+  $form['region-cookies'] = array(
+    '#markup' => '',
+    '#prefix' => '<div id="region-cookies">',
+    '#suffix' => '</div>',
+  );
+
+  return $form;
+}
+
+function _set_region_cookie($form, &$form_state){
+  
+  dsm($form_state);
+
+  $form['region-cookies'] = array(
+    '#markup' => 'Регион изменён',
+    '#prefix' => '<div id="region-cookies">',
+    '#suffix' => '</div>',
+  );  
+  
+  $commands[] = ajax_command_invoke(NULL, 'cookie', array('region', $form_state['input']['region']));
+
+  //return array('#type' => 'ajax', '#commands' => $commands);
+
+}
+
+function _get_regions_list(){
+  $vid = taxonomy_vocabulary_machine_name_load('locales')->vid;
+  $term_rf = taxonomy_get_term_by_name('РФ');
+  
+  foreach ($term_rf as $value) {
+    $tid_rf = $value->tid;
+  }
+  $childrens = taxonomy_get_children($tid_rf, $vid);
+
+  $output = array();
+
+  foreach ($childrens as $key => $value) {
+    $output[$key] = $value->name;
+  }
+
+  return $output;
+}
+
 function _pager($total){
   //pager
   $per_page = 20;
@@ -379,3 +464,4 @@ function locale_batch_finished($success, $results, $operations) {
     drupal_set_message('Завершено с ошибками.', 'error');
   }
 }
+

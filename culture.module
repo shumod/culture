@@ -125,7 +125,6 @@ function culture_block_view($delta = '') {
       $block['subject'] = 'Выберите регион';
       $block['content'] = drupal_render(drupal_get_form('_select_region_form'));
       drupal_add_library('system','jquery.cookie');
-      dsm($_COOKIE['region']);
       break;
   }
   return $block;
@@ -134,41 +133,19 @@ function culture_block_view($delta = '') {
 function _select_region_form($form, &$form_state){
   $form = array();
 
+  $cookie = (isset($_COOKIE['region'])) ? $_COOKIE['region'] : 0 ;
+
   $form['region'] = array(
     '#type' => 'select',
     '#options' => _get_regions_list(),
-    //'#default_value' => 1,
-    '#ajax' => array(
-      'callback' => '_set_region_cookie',
-      'wrapper' => 'region-cookies',
-      'method' => 'replace',
-      'effect' => 'fade',
-    ),
+    '#default_value' => $cookie,
   );
   
   $form['region-cookies'] = array(
-    '#markup' => '',
-    '#prefix' => '<div id="region-cookies">',
-    '#suffix' => '</div>',
+    '#markup' => '<div id="region-cookies"></div>',
   );
 
   return $form;
-}
-
-function _set_region_cookie($form, &$form_state){
-  
-  dsm($form_state);
-
-  $form['region-cookies'] = array(
-    '#markup' => 'Регион изменён',
-    '#prefix' => '<div id="region-cookies">',
-    '#suffix' => '</div>',
-  );  
-  
-  $commands[] = ajax_command_invoke(NULL, 'cookie', array('region', $form_state['input']['region']));
-
-  //return array('#type' => 'ajax', '#commands' => $commands);
-
 }
 
 function _get_regions_list(){

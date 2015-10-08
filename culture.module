@@ -155,11 +155,12 @@ function _get_regions_list(){
   
   foreach ($term_rf as $value) {
     $tid_rf = $value->tid;
+    $name_rf = 'Вся Россия';
   }
   $childrens = taxonomy_get_children($tid_rf, $vid);
 
   $output = array();
-
+  $output[$tid_rf] = $name_rf;
   foreach ($childrens as $key => $value) {
     $output[$key] = $value->name;
   }
@@ -188,16 +189,22 @@ function _decode($url, $region = TRUE){
     $data_arr[] = 'offset='.$offset;
   }
 
-  if($region && isset($_COOKIE['region'])){
-    
-    $childrens = taxonomy_get_children($_COOKIE['region']);
-    
-    $children = array();
+  $term_rf = taxonomy_get_term_by_name('РФ');
+  foreach ($term_rf as $value) {
+    $tid_rf = $value->tid;
+  }
 
-    foreach ($childrens as $key => $value) {
-      $children[] = $value->field_locales_id['und'][0]['value'];
+  if($region && isset($_COOKIE['region'])){
+    if ($_COOKIE['region'] != $tid_rf) {
+      $childrens = taxonomy_get_children($_COOKIE['region']);
+      
+      $children = array();
+      //$children[] = $_COOKIE['region'];
+      foreach ($childrens as $key => $value) {
+        $children[] = $value->field_locales_id['und'][0]['value'];
+      }
+      $data_arr[] = 'locales='.implode(',', $children);
     }
-    $data_arr[] = 'locales='.implode(',', $children);
   }
 
   $data = (sizeof($data_arr) > 0) ? implode('&', $data_arr) : NULL;

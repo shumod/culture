@@ -137,7 +137,7 @@ function _decode($url){
 
   $decode = json_decode($result->data);
 
-  dsm($decode);
+  //dsm($decode);
   return $decode;
 }
 
@@ -291,7 +291,7 @@ function locales_form_submit($form, &$form_state){
   $total = _decode($total_url)->total;
 
   $operations = array();
-  for($i = 0; $i < 10; $i++){
+  for($i = 0; $i < $total; $i++){
     $operations[] = array('reload_taxonomy_locale_term', array($vid));
   }
 
@@ -346,6 +346,19 @@ function reload_taxonomy_locale_term($vid, &$context) {
 
   $term = (object) $term;
   taxonomy_term_save($term);
+  
+  $parent_id = db_select('field_data_field_locales_id', 'lid')
+    ->fields('lid', array('entity_id'))
+    ->condition('lid.field_locales_id_value', $decode->locales[0]->parentId)
+    ->execute()
+    ->fetchField();
+  $parent = ($parent_id == '') ? 0 : $parent_id;
+  
+  $term->field_locales_id['und'][0]['value'] = $decode->locales[0]->_id;
+  $term->field_locales_timezone['und'][0]['value'] = $decode->locales[0]->timezone;
+  $term->parent[0] = $parent;
+  taxonomy_term_save($term);
+
   $context['results'][] = 'good';
   
 

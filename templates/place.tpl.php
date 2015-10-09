@@ -9,3 +9,4 @@
 <div class="place-contacts"><?php print $contacts;?></div>
 <div class="place-schedule"><?php print $schedule;?></div>
 <div class="place-map"><?php print $map;?></div>
+<div class="place-gallery"><?php print $gallery;?></div>

@@ -4,5 +4,11 @@ version = 7.x-1.0
 core = 7.x
 package = Custom
 
+dependencies[] = jquery_update
+dependencies[] = colorbox
+
 files[] = culture.module
 scripts[] = culture.js
+scripts[] = carousel/owl.carousel.js
+stylesheets[all][] = carousel/owl.carousel.css
+stylesheets[all][] = carousel/owl.theme.css

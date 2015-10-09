@@ -9,5 +9,11 @@
       location.reload();
     });
 
+    $(".multiple-items").owlCarousel({
+    	items : 3,
+    	navigation : true,
+    	lazyLoad : true,
+    });
+
   });
 })(jQuery);

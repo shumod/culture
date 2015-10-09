@@ -19,13 +19,14 @@ function _events(){
 function _event($eid){
   $url = 'http://all.culture.ru/api/1.0/events?ids='.$eid;
 
-  $decode = _decode($url);
+  $decode = _decode($url, FALSE);
 
   $event = $decode->events[0];
   $image = $event->image;
   $output = theme('event', 
     array(
       'title' => $event->name,
+      'address' => $event->address->street,
       'organization' => l($event->organization->name, 'organizations/'.$event->organization->_id),
     )
   );

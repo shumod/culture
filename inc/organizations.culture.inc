@@ -19,12 +19,13 @@ function _organizations(){
 function _organization($oid){
   $url = 'http://all.culture.ru/api/1.0/organizations?ids='.$oid;
 
-  $decode = _decode($url);
+  $decode = _decode($url, FALSE);
 
   $organization = $decode->organizations[0];
   $output = theme('organization', 
     array(
       'title' => $organization->name,
+      'address' => $organization->address,
     )
   );
 

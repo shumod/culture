@@ -19,7 +19,7 @@ function _places(){
 function _place($pid){
   $url = 'http://all.culture.ru/api/1.0/places/'.$pid;
 
-  $decode = _decode($url);
+  $decode = _decode($url, FALSE);
 
   $place = $decode->place;
   $image = $place->image;
@@ -35,7 +35,8 @@ function _place($pid){
       'locale' => l($place->locale->name, 'locale/'.$place->locale->_id),
       'contacts' => _contacts($place->contacts),
       'map' => _map($place->address->mapPosition->coordinates[0], $place->address->mapPosition->coordinates[1], $place->name, '<strong>'.$place->name.'</strong><br/>'.$place->address->street),
-      'schedule' => _schedule($place->workingSchedule),
+      'schedule' => isset($place->workingSchedule) ? _schedule($place->workingSchedule) : NULL,
+      'gallery' => isset($place->gallery) ? _gallery($place->gallery) : NULL,
     )
   );
 

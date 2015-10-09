@@ -29,7 +29,7 @@ function _place($pid){
       'address' => $place->address->street,
       'image' => '<img src="http://all.culture.ru/uploads/'.$image->name.'" width="300px" />',
       'description' => $place->description,
-      'organization' => l($place->organization->name, 'organizations/'.$place->organization->_id),
+      'organization' => l($place->organization->name, 'places/'.$place->organization->_id),
       'category' => l($place->category->name, 'category/'.$place->category->_id),
       'tags' => _tags($place->tags),
       'locale' => l($place->locale->name, 'locale/'.$place->locale->_id),

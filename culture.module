@@ -330,12 +330,14 @@ function _map($coordinateX, $coordinateY, $hint, $baloon){
 
 //функция для вывода галлереи. получает массив и выводит обратно галерею для owl gallery
 function _gallery($gallery){
+  drupal_add_js('//cdn.jsdelivr.net/jquery.slick/1.5.7/slick.min.js', 'external');
+  drupal_add_css('//cdn.jsdelivr.net/jquery.slick/1.5.7/slick.css', 'external');
   $output = '';
 
   if (sizeof($gallery) > 0) {
-    $output = '<h2>Галерея:</h2> <div class="multiple-items">';
+    $output = '<h2>Галерея:</h2> <div class="gallery">';
     foreach ($gallery as $foto) {
-      $output .= '<img src="http://all.culture.ru/uploads/'.$foto->name.'" height="150px" />';
+      $output .= '<div><img src="http://all.culture.ru/uploads/'.$foto->name.'" height="150px" /></div>';
     }
     $output .= '</div>';
   }

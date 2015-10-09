@@ -9,10 +9,14 @@
       location.reload();
     });
 
-    $(".multiple-items").owlCarousel({
-    	items : 3,
-    	navigation : true,
-    	lazyLoad : true,
+    $('.gallery').slick({
+      dots: true,
+      infinite: true,
+      speed: 300,
+      slidesToShow: 3,
+      centerMode: true,
+      lazyLoad: 'ondemand',
+      //variableWidth: true
     });
 
   });

@@ -297,7 +297,7 @@ function _schedule($schedule){
 }
 
 //функция, которая отдаёт карту с точкой в заданных координатах
-function _map($coordinateX, $coordinateY, $hint, $baloon){
+function _map($coordinateX, $coordinateY, $name, $street, $comment){
   drupal_add_js('https://api-maps.yandex.ru/2.1/?lang=ru_RU', 'external');
   drupal_add_js('
       ymaps.ready(init);
@@ -311,8 +311,8 @@ function _map($coordinateX, $coordinateY, $hint, $baloon){
             });
 
             myPlacemark = new ymaps.Placemark(['.$coordinateX.', '.$coordinateY.'], { 
-                hintContent: "'.$hint.'", 
-                balloonContent: "'.$baloon.'" 
+                hintContent: "<strong>'.$name.'</strong>", 
+                balloonContent: "<strong>'.$name.'</strong><br>'.$street.$comment.'",
             });
 
             myMap.geoObjects.add(myPlacemark);
@@ -332,12 +332,33 @@ function _map($coordinateX, $coordinateY, $hint, $baloon){
 function _gallery($gallery){
   drupal_add_js('//cdn.jsdelivr.net/jquery.slick/1.5.7/slick.min.js', 'external');
   drupal_add_css('//cdn.jsdelivr.net/jquery.slick/1.5.7/slick.css', 'external');
+  $image_width = 200;
+  $image_height = 150;
   $output = '';
 
   if (sizeof($gallery) > 0) {
     $output = '<h2>Галерея:</h2> <div class="gallery">';
     foreach ($gallery as $foto) {
-      $output .= '<div><img src="http://all.culture.ru/uploads/'.$foto->name.'" height="150px" /></div>';
+      //запрашиваем пресет фотографии
+      $replace = '_w' . $image_width . '_h' . $image_height.'.';
+      $foto_preset_url = str_replace('.', $replace, $foto->name);
+
+      //получаем ссылку на обычную фотку
+      $foto_url = 'http://all.culture.ru/uploads/' . $foto->name;
+
+      //получаем тэг с фото
+      $foto_preset = '<img src="http://all.culture.ru/uploads/'.$foto_preset_url.'" />';
+
+      //формируем ссылку на фото
+      $options = array(
+        'html' => 'TRUE',
+        'attributes' => array(
+          'class' => array('colorbox'),
+          'rel' => 'gallery',
+        ),
+      );
+      $foto_link = l($foto_preset, $foto_url, $options);
+      $output .= '<div>'.$foto_link.'</div>';
     }
     $output .= '</div>';
   }

@@ -3,7 +3,6 @@
 // Функции вывода событий
 function _events(){
   $url = 'http://all.culture.ru/api/1.0/events';
-
   $decode = _decode($url);
 
   $items = array();
@@ -17,28 +16,45 @@ function _events(){
 }
 
 function _event($eid){
+  //декодируем урл события
   $url = 'http://all.culture.ru/api/1.0/events?ids='.$eid;
+  $decode = _decode($url, FALSE); //false - значит, что мы не применяем фильтр региона
 
-  $decode = _decode($url, FALSE);
+  //вытягиваем переменные события
+  $event = $decode->events[0];                            //определяем массив с самим событием
+  $image = $event->image;                                 //получаем картинку события
+  $name = $event->name;                                   //получаем название события
+  $place = ($event->place) ? $event->place->name : NULL;  //если есть место проведения, то место
+  $category = $event->category->name;                     //название категории события
+  $X = $event->address->mapPosition->coordinates[0];      //координаты
+  $Y = $event->address->mapPosition->coordinates[1];     
+  $street = $event->address->street;                      //улица
+  //если есть, то комментарий, как добраться
+  $address_comment = ($event->address->comment) ? ' ('.$event->address->comment.')' : '' ; 
 
-  $event = $decode->events[0];
-  $image = $event->image;
+  //это для вывода в .tpl файл
   $output = theme('event', 
     array(
-      'title' => $event->name,
-      'address' => $event->address->street,
+      'title' => $name,
+      'address' => $street.$address_comment,
       'description' => $event->description,
-      'category' => l($event->category->name, 'category/'.$event->category->_id),
+      'category' => l($category, 'category/'.$event->category->_id),
       'tags' => _tags($event->tags),
       'seances' => _seances($event->seances),
       'isfree' => ($event->isFree) ? 'Событие бесплатно' : 'Событие платно. ' . _price($event->price, $event->maxPrice),
       'persons' => (isset($event->extraFields->persons)) ? _extra($event->extraFields->persons) : '',
       'place' => ($event->place != NULL) ? l($event->place->name, 'places/'.$event->place->_id) : '',
-      'map' => _map($event->address->mapPosition->coordinates[0], $event->address->mapPosition->coordinates[1], $event->name, '<strong>'.$event->name.'</strong><br/>'.$event->address->street),
+      'map' => _map($X, $Y, $name, $street, $address_comment),
       'organization' => l($event->organization->name, 'organizations/'.$event->organization->_id),
       'gallery' => isset($event->gallery) ? _gallery($event->gallery) : NULL,
     )
   );
+
+  //задаём тайтл для события
+  $title[] = $name;
+  $title[] = $category;
+  if($place){ $title[] = $place; }
+  drupal_set_title(implode(' - ', $title));
 
   return $output;
 }

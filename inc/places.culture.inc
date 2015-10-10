@@ -17,30 +17,41 @@ function _places(){
 }
 
 function _place($pid){
+  //декодируем урл места
   $url = 'http://all.culture.ru/api/1.0/places/'.$pid;
+  $decode = _decode($url, FALSE); //false - значит, что мы не применяем фильтр региона
 
-  $decode = _decode($url, FALSE);
+  //вытягиваем переменные места
+  $place = $decode->place;                            //определяем массив с самим местом
+  $image = $place->image;                             //получаем картинку места
+  $name = $place->name;                               //получаем название события
+  $category = $place->category->name;                 //название категории события
+  $X = $place->address->mapPosition->coordinates[0];      //координаты
+  $Y = $place->address->mapPosition->coordinates[1];
+  $street = $place->address->street;                      //улица
+  //если есть, то комментарий, как добраться
+  $address_comment = ($place->address->comment) ? ' ('.$place->address->comment.')' : '' ;
 
-  $place = $decode->place;
-  $image = $place->image;
   $output = theme('place', 
     array(
-      'title' => $place->name,
+      'title' => $name,
       'address' => $place->address->street,
       'image' => '<img src="http://all.culture.ru/uploads/'.$image->name.'" width="300px" />',
       'description' => $place->description,
-      'organization' => l($place->organization->name, 'places/'.$place->organization->_id),
-      'category' => l($place->category->name, 'category/'.$place->category->_id),
+      'organization' => l($place->organization->name, 'organizations/'.$place->organization->_id),
+      'category' => l($category, 'category/'.$place->category->_id),
       'tags' => _tags($place->tags),
       'locale' => l($place->locale->name, 'locale/'.$place->locale->_id),
       'contacts' => _contacts($place->contacts),
-      'map' => _map($place->address->mapPosition->coordinates[0], $place->address->mapPosition->coordinates[1], $place->name, '<strong>'.$place->name.'</strong><br/>'.$place->address->street),
+      'map' => _map($X, $Y, $name, $street, $address_comment),
       'schedule' => isset($place->workingSchedule) ? _schedule($place->workingSchedule) : NULL,
       'gallery' => isset($place->gallery) ? _gallery($place->gallery) : NULL,
     )
   );
 
-  drupal_set_title($place->name);
+  $title[] = $name;
+  $title[] = $category;
+  drupal_set_title(implode(' - ', $title));
 
   return $output;
 }

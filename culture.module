@@ -185,6 +185,8 @@ function _pager($total){
 //функция декодирует урл
 function _decode($url, $region = TRUE){
 
+  dsm($_COOKIE);
+
   //для пейджера
   $data_arr = array();
   if(isset($_GET['page'])){
@@ -365,6 +367,31 @@ function _gallery($gallery){
 
   return $output;
 }
+
+//выводит картинку
+function _image($image_name){
+  $width = 200;
+  $height = 150;
+  $replace = '_w' . $width . '_h' . $height.'.';
+  $preset_name = str_replace('.', $replace, $image_name);
+
+  $preset = '<img src="http://all.culture.ru/uploads/'.$preset_name.'" />';
+  $image_url = 'http://all.culture.ru/uploads/'.$image_name;
+
+  //формируем ссылку на фото
+  $options = array(
+    'html' => 'TRUE',
+    'attributes' => array(
+      'class' => array('colorbox'),
+      'rel' => 'gallery',
+    ),
+  );
+
+  $image = l($preset, $image_url, $options);
+
+  return $image;
+}
+
 //форматирует номер телефона
 function _format_phone($phone = '', $convert = false, $trim = true){
   // If we have not entered a phone number just return empty

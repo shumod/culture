@@ -36,7 +36,7 @@ function _place($pid){
     array(
       'title' => $name,
       'address' => $place->address->street,
-      'image' => '<img src="http://all.culture.ru/uploads/'.$image->name.'" width="300px" />',
+      'image' => _image($image->name),
       'description' => $place->description,
       'organization' => l($place->organization->name, 'organizations/'.$place->organization->_id),
       'category' => l($category, 'category/'.$place->category->_id),

@@ -56,7 +56,6 @@ function culture_menu() {
     'type' => MENU_NORMAL_ITEM,
   ); 
 
-
   //локали
   $items['reload-locales'] = array(
     'title' => 'Обновление списка локалей',
@@ -64,6 +63,21 @@ function culture_menu() {
     'page arguments' => array('locales_form'),
     'file' => 'inc/organizations.culture.inc',
     'access arguments' => array('administer site configuration'),
+  );
+
+  //локали
+  $items['sitemap.txt'] = array(
+    'page callback' => '_main_sitemap',
+    'file' => 'inc/sitemap.inc',
+    'access arguments' => array('View published content'), 
+    'type' => MENU_CALLBACK, 
+  );
+
+  $items['events.txt'] = array(
+    'page callback' => '_events_sitemap',
+    'file' => 'inc/sitemap.inc',
+    'access arguments' => array('View published content'), 
+    'type' => MENU_CALLBACK, 
   );
 
   return $items;
@@ -75,15 +89,28 @@ function culture_menu() {
 function culture_theme() {
   return array(
 
+    //темплейт для страницы списка мест
+    'places' => array(
+      'variables' => array(
+        'title' => NULL,
+      ),
+      'template' => 'templates/places',
+    ),
+
     //темплейт для страницы места
     'place' => array(
       'variables' => array(
         'title' => NULL,
-        'address' => NULL,
-        'image' => NULL,
-        'description' => NULL,
       ),
       'template' => 'templates/place',
+    ),
+
+    //темплейт для страницы списка событий
+    'events' => array(
+      'variables' => array(
+        'title' => NULL,
+      ),
+      'template' => 'templates/events',
     ),
 
     //темплейт для страницы события

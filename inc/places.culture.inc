@@ -7,13 +7,21 @@ function _places(){
   $decode = _decode($url);
 
   $items = array();
-  foreach ($decode->places as $key => $value) {
-    $items[] = l($value->name, 'places/'.$value->_id);
+  $output = '';
+  foreach ($decode->places as $key => $place) {
+    $output .= theme('places', 
+      array(
+        'title' => l($place->name, 'places/' . $place->_id),
+        'image' => _image($place->image->name),
+        'description' => $place->description,
+      )
+    );
   }
 
   $pager = _pager($decode->total);
+  $output .= $pager;
 
-  return theme('item_list', array('items' => $items)) . $pager;
+  return $output;
 }
 
 function _place($pid){
@@ -21,42 +29,47 @@ function _place($pid){
   $url = 'http://all.culture.ru/api/1.0/places/'.$pid;
   $decode = _decode($url, FALSE); //false - значит, что мы не применяем фильтр региона
 
-  //вытягиваем переменные места
-  $place = $decode->place;                            //определяем массив с самим местом
-  $image = $place->image;                             //получаем картинку места
-  $name = $place->name;                               //получаем название события
-  $category = $place->category->name;                 //название категории события
-  $X = $place->address->mapPosition->coordinates[0];      //координаты
-  $Y = $place->address->mapPosition->coordinates[1];
-  $street = $place->address->street;                      //улица
-  //если есть, то комментарий, как добраться
-  $address_comment = ($place->address->comment) ? ' ('.$place->address->comment.')' : '' ;
+  if(sizeof($decode->place) == 0){
+    return drupal_not_found();  
+  }
+  else{
+    //вытягиваем переменные места
+    $place = $decode->place;                            //определяем массив с самим местом
+    $image = $place->image;                             //получаем картинку места
+    $name = $place->name;                               //получаем название события
+    $category = $place->category->name;                 //название категории события
+    $X = $place->address->mapPosition->coordinates[0];      //координаты
+    $Y = $place->address->mapPosition->coordinates[1];
+    $street = $place->address->street;                      //улица
+    //если есть, то комментарий, как добраться
+    $address_comment = ($place->address->comment) ? ' ('.$place->address->comment.')' : '' ;
 
-  $output = theme('place', 
-    array(
-      'title' => $name,
-      'address' => $place->address->street,
-      'image' => _image($image->name),
-      'description' => $place->description,
-      'organization' => l($place->organization->name, 'organizations/'.$place->organization->_id),
-      'category' => l($category, 'category/'.$place->category->_id),
-      'tags' => _tags($place->tags),
-      'locale' => l($place->locale->name, 'locale/'.$place->locale->_id),
-      'contacts' => _contacts($place->contacts),
-      'map' => _map($X, $Y, $name, $street, $address_comment),
-      'schedule' => isset($place->workingSchedule) ? _schedule($place->workingSchedule) : NULL,
-      'gallery' => isset($place->gallery) ? _gallery($place->gallery) : NULL,
-    )
-  );
+    $output = theme('place', 
+      array(
+        'title' => $name,
+        'address' => $place->address->street,
+        'image' => _image($image->name),
+        'description' => $place->description,
+        'organization' => l($place->organization->name, 'organizations/'.$place->organization->_id),
+        'category' => l($category, 'category/'.$place->category->_id),
+        'tags' => _tags($place->tags),
+        'locale' => l($place->locale->name, 'locale/'.$place->locale->_id),
+        'contacts' => _contacts($place->contacts),
+        'map' => _map($X, $Y, $name, $street, $address_comment),
+        'schedule' => isset($place->workingSchedule) ? _schedule($place->workingSchedule) : NULL,
+        'gallery' => isset($place->gallery) ? _gallery($place->gallery) : NULL,
+      )
+    );
 
-  $title[] = $name;
-  $title[] = $category;
-  drupal_set_title(implode(' - ', $title));
+    $title[] = $name;
+    $title[] = $category;
+    drupal_set_title(implode(' - ', $title));
 
-  //добавляем ключевые слова
-  $keywords_array = array();
-  $keywords_array[] = $category;
-  _set_seo_tags($keywords_array);
+    //добавляем ключевые слова
+    $keywords_array = array();
+    $keywords_array[] = $category;
+    _set_seo_tags($keywords_array);
 
-  return $output;
+    return $output;
+  }
 }

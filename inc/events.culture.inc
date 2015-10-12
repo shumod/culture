@@ -56,6 +56,13 @@ function _event($eid){
   if($place){ $title[] = $place; }
   drupal_set_title(implode(' - ', $title));
 
+  //задаём мета-тэги
+  $keywords_array = array();
+  $keywords_array[] = $category;
+  $keywords_array[] = strip_tags(_tags($event->tags));
+  $description = (sizeof($event->shortDescription) > 0) ? strip_tags($event->shortDescription) : '' ;
+  _set_seo_tags($keywords_array, $description);
+
   return $output;
 }
 

@@ -234,7 +234,7 @@ function _tags($tags_array){
   foreach ($tags_array as $key => $value) {
     $tags[] = l($value->name, 'tags/'.$value->_id);
   }
-  $output = (sizeof($tags) > 0) ? 'Тэги: '.implode(', ', $tags) : '';
+  $output = (sizeof($tags) > 0) ? implode(', ', $tags) : '';
   
   return $output;
 }
@@ -390,6 +390,30 @@ function _image($image_name){
   $image = l($preset, $image_url, $options);
 
   return $image;
+}
+
+function _set_seo_tags($keywords_array = array(), $description_string = ''){
+  if(sizeof($keywords_array > 0)){
+    $keywords = array(
+      '#tag' => 'meta',
+      '#attributes' => array(
+        'name' => 'keywords',
+        'content' => implode(',', $keywords_array),
+      ),
+    );
+    drupal_add_html_head($keywords, 'meta_keywords');
+  }
+
+  if($description_string != ''){
+    $description = array(
+      '#tag' => 'meta',
+      '#attributes' => array(
+        'name' => 'description',
+        'content' => $description_string,
+      ),
+    );
+    drupal_add_html_head($description, 'meta_description');
+  }
 }
 
 //форматирует номер телефона

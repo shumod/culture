@@ -53,5 +53,10 @@ function _place($pid){
   $title[] = $category;
   drupal_set_title(implode(' - ', $title));
 
+  //добавляем ключевые слова
+  $keywords_array = array();
+  $keywords_array[] = $category;
+  _set_seo_tags($keywords_array);
+
   return $output;
 }

@@ -83,9 +83,10 @@ function _seances($seanses_array){
 function _extra($extra_array){
   $output = 'Персоны: <br>';
   $person_type = array(
-    'director' => 'Директор:',
-    'actor' => 'Актёры:',
-    'artisticDirector' => 'Художественный руководитель',
+    'director' => 'Директор: ',
+    'actor' => 'Актёры: ',
+    'artisticDirector' => 'Художественный руководитель: ',
+    'choreographer' => 'Хореограф: ',
   );
   $items = array();
   foreach ($extra_array as $key => $person) {
@@ -104,5 +105,12 @@ function _extra($extra_array){
 }
 
 function _price($price, $maxprice){
-  return 'Стоимость: ' . $price . ' - ' . $maxprice . ' руб.';
+  $output = '';
+  if($price == $maxprice){
+    $output = 'Стоимость: ' . $price . ' руб.';
+  }
+  else {
+    $output = 'Стоимость: ' . $price . ' - ' . $maxprice . ' руб.';
+  }
+  return $output;
 }

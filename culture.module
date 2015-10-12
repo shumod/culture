@@ -477,6 +477,16 @@ function locales_form($form, &$form_state){
     '#value' => 'Начать обновление',
   );
 
+  $total_url = 'http://all.culture.ru/api/1.0/locales?limit=1';
+  $total = _decode($total_url, FALSE)->total;
+
+  $terms_array = taxonomy_get_tree(taxonomy_vocabulary_machine_name_load('locales')->vid);
+  $terms_count = sizeof($terms_array);
+
+  $form['submit'] = array(
+    '#markup' => 'Всего локалей в открытой базе: ' . $total . ', в нашей базе: ' . $terms_count,
+  );  
+
   return $form;
 }
 

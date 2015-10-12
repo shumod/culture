@@ -2,7 +2,7 @@
 <div class="event-organization">Организация: <?php print $organization;?></div>
 <div class="event-description"><?php print $description;?></div>
 <div class="event-category">Категория: <?php print $category;?></div>
-<div class="event-tags">Категория: <?php print $tags;?></div>
+<div class="event-tags">Тэги: <?php print $tags;?></div>
 <div class="event-persons"><?php print $persons;?></div>
 <div class="event-isfree"><?php print $isfree;?></div>
 <div class="event-seances"><?php print $seances;?></div>

@@ -10,7 +10,7 @@ function _events(){
     $output .= theme('events', 
       array(
         'title' => l($event->name, 'events/'.$event->_id),
-        'image' => _image($event->image->name),
+        'image' => _image($event->image->name, 'image'),
         'description' => truncate_utf8(strip_tags($event->description), 300, TRUE, TRUE),
         'price' => ($event->isFree) ? 'Событие бесплатно' : 'Событие платно. ' . _price($event->price, $event->maxPrice),
       )
@@ -23,6 +23,7 @@ function _events(){
   return $output;
 }
 
+//выводит одно событие
 function _event($eid){
   //декодируем урл события
   $url = 'http://all.culture.ru/api/1.0/events?ids='.$eid;

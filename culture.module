@@ -407,25 +407,32 @@ function _gallery($gallery){
 }
 
 //выводит картинку
-function _image($image_name){
-  $width = 200;
-  $height = 150;
+function _image($image_name, $type = 'colorbox', $width = 200, $height = 150){
+  $image = '';
+
   $replace = '_w' . $width . '_h' . $height.'.';
   $preset_name = str_replace('.', $replace, $image_name);
-
   $preset = '<img src="http://all.culture.ru/uploads/'.$preset_name.'" />';
-  $image_url = 'http://all.culture.ru/uploads/'.$image_name;
 
-  //формируем ссылку на фото
-  $options = array(
-    'html' => 'TRUE',
-    'attributes' => array(
-      'class' => array('colorbox'),
-      'rel' => 'gallery',
-    ),
-  );
+  if($type == 'colorbox'){
 
-  $image = l($preset, $image_url, $options);
+
+    $image_url = 'http://all.culture.ru/uploads/'.$image_name;
+
+    //формируем ссылку на фото
+    $options = array(
+      'html' => 'TRUE',
+      'attributes' => array(
+        'class' => array('colorbox'),
+        'rel' => 'gallery',
+      ),
+    );
+
+    $image = l($preset, $image_url, $options);
+  }
+  elseif ($type == 'image') {
+    $image = $preset;
+  }
 
   return $image;
 }

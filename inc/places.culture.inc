@@ -12,7 +12,7 @@ function _places(){
     $output .= theme('places', 
       array(
         'title' => l($place->name, 'places/' . $place->_id),
-        'image' => _image($place->image->name),
+        'image' => _image($place->image->name, 'image'),
         'description' => $place->description,
       )
     );

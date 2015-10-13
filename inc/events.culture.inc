@@ -103,17 +103,19 @@ function _extra($extra_array){
     'actor' => 'Актёры: ',
     'artisticDirector' => 'Художественный руководитель: ',
     'choreographer' => 'Хореограф: ',
+    'conductor' => 'Дерижёр: ',
   );
   $items = array();
   foreach ($extra_array as $key => $person) {
     $items[$person->role][] = $person->name; 
   }
   foreach ($items as $role => $name_list) {
-    if(sizeof($name_list) > 1){
+    if(isset($person_type[$role])){
       $output .= $person_type[$role] . theme('item_list', array('items' => $name_list));
     }
     else{
-      $output .= $person_type[$role] . $name_list[0] . '<br />';
+      $output .= theme('item_list', array('items' => $name_list));
+      dsm($role);
     }
   }
 

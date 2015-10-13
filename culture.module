@@ -339,6 +339,9 @@ function _schedule($schedule){
 //функция, которая отдаёт карту с точкой в заданных координатах
 function _map($coordinateX, $coordinateY, $name, $street, $comment){
   drupal_add_js('https://api-maps.yandex.ru/2.1/?lang=ru_RU', 'external');
+  $name = htmlspecialchars($name);
+  $street = htmlspecialchars($street);
+  $comment = htmlspecialchars($comment);
   drupal_add_js('
       ymaps.ready(init);
         var myMap,

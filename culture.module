@@ -65,16 +65,27 @@ function culture_menu() {
     'access arguments' => array('administer site configuration'),
   );
 
-  //локали
+  //сайтмэп
   $items['sitemap.txt'] = array(
     'page callback' => '_main_sitemap',
     'file' => 'inc/sitemap.inc',
     'access arguments' => array('View published content'), 
     'type' => MENU_CALLBACK, 
   );
-
   $items['events.txt'] = array(
     'page callback' => '_events_sitemap',
+    'file' => 'inc/sitemap.inc',
+    'access arguments' => array('View published content'), 
+    'type' => MENU_CALLBACK, 
+  );
+  $items['places.txt'] = array(
+    'page callback' => '_places_sitemap',
+    'file' => 'inc/sitemap.inc',
+    'access arguments' => array('View published content'), 
+    'type' => MENU_CALLBACK, 
+  );
+  $items['organizations.txt'] = array(
+    'page callback' => '_organizations_sitemap',
     'file' => 'inc/sitemap.inc',
     'access arguments' => array('View published content'), 
     'type' => MENU_CALLBACK, 

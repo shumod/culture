@@ -8,8 +8,10 @@ dependencies[] = jquery_update
 dependencies[] = colorbox
 
 files[] = culture.module
+
 scripts[] = js/culture.js
 scripts[] = js/readmore.min.js
 scripts[] = js/carousel/owl.carousel.js
+
 stylesheets[all][] = js/carousel/owl.carousel.css
 stylesheets[all][] = js/carousel/owl.theme.css

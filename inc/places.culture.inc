@@ -13,7 +13,7 @@ function _places(){
       array(
         'title' => l($place->name, 'places/' . $place->_id),
         'image' => _image($place->image->name, 'image'),
-        'description' => $place->description,
+        'description' => truncate_utf8(strip_tags($place->description), 300, TRUE, TRUE),
       )
     );
   }

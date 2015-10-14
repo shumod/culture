@@ -90,6 +90,12 @@ function culture_menu() {
     'access arguments' => array('View published content'), 
     'type' => MENU_CALLBACK, 
   );
+  $items['search'] = array(
+    'page callback' => '_search_page',
+    'file' => 'inc/search.inc',
+    'access arguments' => array('View published content'), 
+    'type' => MENU_CALLBACK, 
+  );
 
   return $items;
 }

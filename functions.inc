@@ -49,7 +49,9 @@ function _search_form($form, &$form_state){
 }
 
 function _search($form, $form_state){
-  dsm($form_state);
+  $options = array();
+  $options['query']['text'] = $form_state['values']['search-text'];
+  drupal_goto('search', $options);
 }
 
 function set_session($form, $form_state){
@@ -101,8 +103,6 @@ function _pager($total){
 
 //функция декодирует урл и возвращает массив, с которым можно работать
 function _decode($url, $region = TRUE){
-
-  dsm($_SESSION);
 
   //для пейджера
   $data_arr = array();

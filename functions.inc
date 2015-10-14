@@ -4,7 +4,7 @@
 function _select_region_form($form, &$form_state){
   $form = array();
 
-  $cookie = (isset($_SESSION['region'])) ? $_SESSION['region'] : 0 ;
+  $session = (isset($_SESSION['region'])) ? $_SESSION['region'] : 0 ;
 
   $form['#prefix'] = '<div id="reload-region">';
   $form['#suffix'] = '</div>';
@@ -12,18 +12,44 @@ function _select_region_form($form, &$form_state){
   $form['region'] = array(
     '#type' => 'select',
     '#options' => _get_regions_list(),
-    '#default_value' => $cookie,
+    '#default_value' => $session,
     '#ajax' => array(
       'callback' => 'set_session',
       'wrapper' => 'reload-region',
     ),
   );
-  
   $form['region-cookies'] = array(
     '#markup' => '<div id="region-cookies"></div>',
   );
 
   return $form;
+}
+
+//форма поиска
+function _search_form($form, &$form_state){
+  $form = array();
+
+  $form['search-text'] = array(
+    '#type' => 'textfield', 
+    '#title' => 'Что ищем?', 
+    '#size' => 30, 
+    '#maxlength' => 128, 
+    '#required' => TRUE,
+  );
+  $form['search-type'] = array(
+    '#type' => 'radios',
+    '#options' => drupal_map_assoc(array('События', 'Места')),
+  );
+  $form['search-submit'] = array(
+    '#type' => 'submit',
+    '#submit' => array('_search'),
+  );
+
+  return $form;
+}
+
+function _search($form, $form_state){
+  dsm($form_state);
 }
 
 function set_session($form, $form_state){
@@ -102,6 +128,7 @@ function _decode($url, $region = TRUE){
       $data_arr[] = 'locales='.implode(',', $children);
     }
   }
+  //$data_arr[] = 'withIntegration=tulagid';
 
   $data = (sizeof($data_arr) > 0) ? implode('&', $data_arr) : NULL;
 

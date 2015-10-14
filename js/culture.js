@@ -18,5 +18,12 @@
       lessLink: '<a href="#">Скрыть</a>'
     });
 
+    $('.event-persons').readmore({
+      speed: 75,
+      maxHeight: 145,
+      moreLink: '<a href="#">Подробнее</a>',
+      lessLink: '<a href="#">Скрыть</a>'
+    });
+
   });
 })(jQuery);

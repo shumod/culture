@@ -4,12 +4,19 @@
 function _select_region_form($form, &$form_state){
   $form = array();
 
-  $cookie = (isset($_COOKIE['region'])) ? $_COOKIE['region'] : 0 ;
+  $cookie = (isset($_SESSION['region'])) ? $_SESSION['region'] : 0 ;
+
+  $form['#prefix'] = '<div id="reload-region">';
+  $form['#suffix'] = '</div>';
 
   $form['region'] = array(
     '#type' => 'select',
     '#options' => _get_regions_list(),
     '#default_value' => $cookie,
+    '#ajax' => array(
+      'callback' => 'set_session',
+      'wrapper' => 'reload-region',
+    ),
   );
   
   $form['region-cookies'] = array(
@@ -17,6 +24,20 @@ function _select_region_form($form, &$form_state){
   );
 
   return $form;
+}
+
+function set_session($form, $form_state){
+  $_SESSION['region'] = $form_state['input']['region'];
+  $form['region-cookies'] = array(
+    '#markup' => '<div id="region-cookies">Регион обновлён</div>',
+  );  
+  return $form;
+}
+
+function _ajax_command_page_reload() {
+   return array(
+    'command' => 'reload',
+  );
 }
 
 //получаем список всех регионов
@@ -55,7 +76,7 @@ function _pager($total){
 //функция декодирует урл и возвращает массив, с которым можно работать
 function _decode($url, $region = TRUE){
 
-  dsm($_COOKIE);
+  dsm($_SESSION);
 
   //для пейджера
   $data_arr = array();
@@ -69,16 +90,16 @@ function _decode($url, $region = TRUE){
     $tid_rf = $value->tid;
   }
 
-  if($region && isset($_COOKIE['region'])){
-    if ($_COOKIE['region'] != $tid_rf) {
-      $childrens = taxonomy_get_children($_COOKIE['region']);
+  if($region && isset($_SESSION['region'])){
+    if ($_SESSION['region'] != $tid_rf) {
+      $childrens = taxonomy_get_children($_SESSION['region']);
       
       $children = array();
-      //$children[] = $_COOKIE['region'];
+      $children[] = $_SESSION['region'];
       foreach ($childrens as $key => $value) {
         $children[] = $value->field_locales_id['und'][0]['value'];
       }
-      //$data_arr[] = 'locales='.implode(',', $children);
+      $data_arr[] = 'locales='.implode(',', $children);
     }
   }
 

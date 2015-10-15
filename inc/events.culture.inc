@@ -5,7 +5,7 @@ function _events($region = TRUE, $search = ''){
   $url = 'http://all.culture.ru/api/1.0/events';
   $decode = _decode($url, $region, $search);
 
-  $output = drupal_render(drupal_get_form('_events_filter_form'));
+  $output = '';
   if ($decode->total == 0) {
     $output = '<div class="not-found">Событий с заданными параметрами не найдено.</div>';
   }

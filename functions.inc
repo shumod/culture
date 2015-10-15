@@ -29,19 +29,25 @@ function _select_region_form($form, &$form_state){
 function _search_form($form, &$form_state){
   $form = array();
 
+  $default_text = (isset($_GET['text'])) ? $_GET['text'] : '';
   $form['search-text'] = array(
     '#type' => 'textfield', 
     '#title' => 'Что ищем?', 
     '#size' => 30, 
     '#maxlength' => 128, 
     '#required' => TRUE,
+    '#default_value' => $default_text,
   );
+
+  $default_type = (isset($_GET['type'])) ? $_GET['type'] : 'События';
   $form['search-type'] = array(
     '#type' => 'radios',
     '#options' => drupal_map_assoc(array('События', 'Места')),
+    '#default_value' => $default_type,
   );
   $form['search-submit'] = array(
     '#type' => 'submit',
+    '#value' => 'Искать',       
     '#submit' => array('_search'),
   );
 
@@ -51,6 +57,7 @@ function _search_form($form, &$form_state){
 function _search($form, $form_state){
   $options = array();
   $options['query']['text'] = $form_state['values']['search-text'];
+  $options['query']['type'] = $form_state['values']['search-type'];
   drupal_goto('search', $options);
 }
 

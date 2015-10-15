@@ -5,21 +5,26 @@ function _events($region = TRUE, $search = ''){
   $url = 'http://all.culture.ru/api/1.0/events';
   $decode = _decode($url, $region, $search);
 
-  $output = '';
-  foreach ($decode->events as $key => $event) {
-    $output .= theme('events', 
-      array(
-        'title' => l($event->name, 'events/'.$event->_id),
-        'image' => _image($event->image->name, 'image'),
-        'description' => truncate_utf8(strip_tags($event->description), 300, TRUE, TRUE),
-        'price' => ($event->isFree) ? 'Событие бесплатно' : 'Событие платно. ' . _price($event->price, $event->maxPrice),
-        'seance' => _seances_from_to($event->seances),
-      )
-    );
+  $output = drupal_render(drupal_get_form('_events_filter_form'));
+  if ($decode->total == 0) {
+    $output = '<div class="not-found">Событий с заданными параметрами не найдено.</div>';
   }
+  else{
+    foreach ($decode->events as $key => $event) {
+      $output .= theme('events', 
+        array(
+          'title' => l($event->name, 'events/'.$event->_id),
+          'image' => _image($event->image->name, 'image'),
+          'description' => truncate_utf8(strip_tags($event->description), 300, TRUE, TRUE),
+          'price' => ($event->isFree) ? 'Событие бесплатно' : 'Событие платно. ' . _price($event->price, $event->maxPrice),
+          'seance' => _seances_from_to($event->seances),
+        )
+      );
+    }
 
-  $pager = _pager($decode->total);
-  $output .= $pager;
+    $pager = _pager($decode->total);
+    $output .= $pager;
+  }
 
   return $output;
 }

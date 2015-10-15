@@ -7,19 +7,23 @@ function _places($region = TRUE, $search = ''){
 
   $items = array();
   $output = '';
-  foreach ($decode->places as $key => $place) {
-    $output .= theme('places', 
-      array(
-        'title' => l($place->name, 'places/' . $place->_id),
-        'image' => _image($place->image->name, 'image'),
-        'description' => truncate_utf8(strip_tags($place->description), 300, TRUE, TRUE),
-      )
-    );
+  if ($decode->total == 0) {
+    $output = '<div class="not-found">Мест с заданными параметрами не найдено.</div>';
   }
+  else{
+    foreach ($decode->places as $key => $place) {
+      $output .= theme('places', 
+        array(
+          'title' => l($place->name, 'places/' . $place->_id),
+          'image' => _image($place->image->name, 'image'),
+          'description' => truncate_utf8(strip_tags($place->description), 300, TRUE, TRUE),
+        )
+      );
+    }
 
-  $pager = _pager($decode->total);
-  $output .= $pager;
-
+    $pager = _pager($decode->total);
+    $output .= $pager;
+  }
   return $output;
 }
 

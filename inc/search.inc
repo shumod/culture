@@ -12,7 +12,7 @@ function _search_page(){
 	drupal_set_title($title);
 
 	//ищем по тексту
-	$search_text = (isset($_GET['text'])) ? $_GET['text'] : FAKSE ;
+	$search_text = (isset($_GET['text'])) ? $_GET['text'] : FALSE ;
 	if($search_text){
 		$search_type = (isset($_GET['type'])) ? $_GET['type'] : FALSE;
 		switch ($search_type) {

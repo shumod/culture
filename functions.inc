@@ -109,9 +109,9 @@ function _pager($total){
 }
 
 //функция декодирует урл и возвращает массив, с которым можно работать
-function _decode($url, $region = TRUE){
+function _decode($url, $region = TRUE, $search = ''){
 
-  //для пейджера
+  //функции для пейджера
   $data_arr = array();
   if(isset($_GET['page'])){
     $offset = $_GET['page']*20;
@@ -123,6 +123,7 @@ function _decode($url, $region = TRUE){
     $tid_rf = $value->tid;
   }
 
+  //если мы выводим информацию в соответствии с регионом
   if($region && isset($_SESSION['region'])){
     if ($_SESSION['region'] != $tid_rf) {
       $childrens = taxonomy_get_children($_SESSION['region']);
@@ -135,8 +136,13 @@ function _decode($url, $region = TRUE){
       $data_arr[] = 'locales='.implode(',', $children);
     }
   }
-  //$data_arr[] = 'withIntegration=tulagid';
 
+  //если есть поиск, то добавляем в поиск параметры
+  if($search != ''){
+    $data_arr[] = 'nameQuery=' . $search;
+  }
+
+  //собираем массив параметров для запроса
   $data = (sizeof($data_arr) > 0) ? implode('&', $data_arr) : NULL;
 
   $options = array(

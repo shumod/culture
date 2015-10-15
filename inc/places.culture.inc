@@ -1,10 +1,9 @@
 <?
 
 // Функции вывода мест
-function _places(){
+function _places($region = TRUE, $search = ''){
   $url = 'http://all.culture.ru/api/1.0/places';
-
-  $decode = _decode($url);
+  $decode = _decode($url, $region, $search);
 
   $items = array();
   $output = '';

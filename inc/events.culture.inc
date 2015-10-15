@@ -1,9 +1,9 @@
 <?
 
 // Функции вывода событий
-function _events(){
+function _events($region = TRUE, $search = ''){
   $url = 'http://all.culture.ru/api/1.0/events';
-  $decode = _decode($url);
+  $decode = _decode($url, $region, $search);
 
   $output = '';
   foreach ($decode->events as $key => $event) {

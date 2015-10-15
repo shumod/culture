@@ -13,16 +13,22 @@ function _select_region_form($form, &$form_state){
     '#type' => 'select',
     '#options' => _get_regions_list(),
     '#default_value' => $session,
-    '#ajax' => array(
-      'callback' => 'set_session',
-      'wrapper' => 'reload-region',
-    ),
   );
   $form['region-cookies'] = array(
     '#markup' => '<div id="region-cookies"></div>',
   );
 
   return $form;
+}
+
+function _set_region($region_id){
+  if(!is_numeric($region_id)){
+    return drupal_not_found();
+  }
+  else{
+    $_SESSION['region'] = $region_id;
+    drupal_goto($_GET['destination']);
+  }
 }
 
 //форма поиска
@@ -59,20 +65,6 @@ function _search($form, $form_state){
   $options['query']['text'] = $form_state['values']['search-text'];
   $options['query']['type'] = $form_state['values']['search-type'];
   drupal_goto('search', $options);
-}
-
-function set_session($form, $form_state){
-  $_SESSION['region'] = $form_state['input']['region'];
-  $form['region-cookies'] = array(
-    '#markup' => '<div id="region-cookies">Регион обновлён</div>',
-  );  
-  return $form;
-}
-
-function _ajax_command_page_reload() {
-   return array(
-    'command' => 'reload',
-  );
 }
 
 //получаем список всех регионов

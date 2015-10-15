@@ -51,6 +51,7 @@ function _event($eid){
       array(
         'title' => $name,
         'address' => $street.$address_comment,
+        'image' => _image($image->name),
         'description' => $event->description,
         'category' => l($category, 'category/'.$event->category->_id),
         'tags' => _tags($event->tags),

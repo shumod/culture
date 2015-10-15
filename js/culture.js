@@ -1,6 +1,15 @@
 (function($) {
   $(document).ready(function() {
 
+    $('#edit-region').change(function() { 
+      var region = $(this).find('option:selected').val();
+      var destination = window.location.pathname;
+      url = 'set-region/' + region + '?destination=' + destination;
+      //console.log(url);
+      $(location).attr('href',url);
+      
+    });
+
     $('.gallery').slick({
       dots: true,
       infinite: true,

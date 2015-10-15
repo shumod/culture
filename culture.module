@@ -65,6 +65,14 @@ function culture_menu() {
     'access arguments' => array('administer site configuration'),
   );
 
+  //выбор региона
+  $items['set-region/%'] = array(
+    'page callback' => '_set_region',
+    'page arguments' => array(1),
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_NORMAL_ITEM,
+  ); 
+
   //сайтмэп
   $items['sitemap.txt'] = array(
     'page callback' => '_main_sitemap',

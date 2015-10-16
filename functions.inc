@@ -152,10 +152,17 @@ function _decode($url, $region = TRUE, $search = ''){
 }
 
 //формирует список тэгов
-function _tags($tags_array){
+function _tags($tags_array, $link = TRUE){
   $tags = array();
-  foreach ($tags_array as $key => $value) {
-    $tags[] = l($value->name, 'tags/'.$value->_id);
+  if($link){
+    foreach ($tags_array as $key => $value) {
+      $tags[] = l($value->name, 'tags/'.$value->_id);
+    }
+  }
+  else{
+    foreach ($tags_array as $key => $value) {
+      $tags[] = $value->name;
+    }    
   }
   $output = (sizeof($tags) > 0) ? implode(', ', $tags) : '';
   
@@ -348,6 +355,10 @@ function _set_seo_tags($keywords_array = array(), $description_string = ''){
     );
     drupal_add_html_head($description, 'meta_description');
   }
+}
+
+function _get_term_id_from_locale(){
+  return '';
 }
 
 //форматирует номер телефона

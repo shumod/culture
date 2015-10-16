@@ -76,3 +76,7 @@ function _place($pid){
     return $output;
   }
 }
+
+function _seo_places($term_url){
+  return $term_url;
+}

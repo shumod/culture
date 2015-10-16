@@ -3,8 +3,9 @@
 
     $('#edit-region').change(function() { 
       var region = $(this).find('option:selected').val();
-      var destination = window.location.pathname;
-      url = 'set-region/' + region + '?destination=' + destination;
+      //var destination = window.location.pathname;
+      var destination = '/taxonomy/term/' + region;
+      url = '/set-region/' + region + '?destination=' + destination;
       $(location).attr('href',url);
       
     });

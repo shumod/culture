@@ -16,6 +16,15 @@ function culture_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
+  $items['r/%/places'] = array(
+    'title' => 'Места',
+    'page callback' => '_seo_places',
+    'access arguments' => array('administer site configuration'),
+    'page arguments' => array(0),
+    'file' => 'inc/places.culture.inc',  
+    'type' => MENU_NORMAL_ITEM,
+  );
+
   $items['places/%'] = array(
     'page callback' => '_place',
     'page arguments' => array(1),

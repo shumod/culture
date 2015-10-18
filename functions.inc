@@ -82,6 +82,7 @@ function _get_regions_list(){
   $output[$tid_rf] = $name_rf;
   foreach ($childrens as $key => $value) {
     $output[$key] = $value->name;
+    $output[$key]['#attributes'] = '123';
   }
 
   return $output;

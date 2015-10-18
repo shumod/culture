@@ -78,5 +78,13 @@ function _place($pid){
 }
 
 function _seo_places($term_url){
-  return $term_url;
+  $url = drupal_lookup_path('source', $term_url);
+  if($url){
+    $args = explode('/', $url);
+    dsm($args);
+    return $url;    
+  }
+  else{
+    return drupal_not_found();
+  }
 }

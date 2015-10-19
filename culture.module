@@ -6,44 +6,54 @@ module_load_include('inc', 'culture', 'functions');
  * Implements hook_menu().
  */
 function culture_menu() {
- 
+  //регионы
+  $items['r'] = array(
+    'title' => 'Все регионы',
+    'page callback' => '_regions',
+    'access arguments' => array('administer site configuration'),
+    'file' => 'inc/region.inc',  
+    'type' => MENU_NORMAL_ITEM,
+  );
+  $items['r/%'] = array(
+    'title callback' => '_region_title',
+    'title arguments' => array(1),
+    'page callback' => '_region',
+    'access arguments' => array('administer site configuration'),
+    'page arguments' => array(1),
+    'file' => 'inc/region.inc',  
+    'type' => MENU_NORMAL_ITEM,
+  ); 
+
   //места
-  $items['places'] = array(
+  $items['r/%/places'] = array(
     'title' => 'Места',
     'page callback' => '_places',
     'access arguments' => array('administer site configuration'),
-    'file' => 'inc/places.culture.inc',  
-    'type' => MENU_NORMAL_ITEM,
-  );
-
-  $items['r/%/places'] = array(
-    'title' => 'Места',
-    'page callback' => '_seo_places',
-    'access arguments' => array('administer site configuration'),
     'page arguments' => array(1),
     'file' => 'inc/places.culture.inc',  
     'type' => MENU_NORMAL_ITEM,
   );
 
-  $items['places/%'] = array(
+  $items['r/%/places/%'] = array(
     'page callback' => '_place',
-    'page arguments' => array(1),
+    'page arguments' => array(1,3),
     'access arguments' => array('administer site configuration'),
     'file' => 'inc/places.culture.inc',
   );
 
   //события
-  $items['events'] = array(
+  $items['r/%/events'] = array(
     'title' => 'События',
     'page callback' => '_events',
     'access arguments' => array('administer site configuration'),
+    'page arguments' => array(1),
     'file' => 'inc/events.culture.inc',
     'type' => MENU_NORMAL_ITEM,
   );
 
-  $items['events/%'] = array(
+  $items['r/%/events/%'] = array(
     'page callback' => '_event',
-    'page arguments' => array(1),
+    'page arguments' => array(1,3),
     'access arguments' => array('administer site configuration'),
     'file' => 'inc/events.culture.inc',
     'type' => MENU_NORMAL_ITEM,

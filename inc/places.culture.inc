@@ -14,7 +14,7 @@ function _places($region = TRUE, $search = ''){
     foreach ($decode->places as $key => $place) {
       $output .= theme('places', 
         array(
-          'title' => l($place->name, 'places/' . $place->_id),
+          'title' => l($place->name, drupal_get_path_alias() . '/' . $place->_id),
           'image' => _image($place->image->name, 'image'),
           'description' => truncate_utf8(strip_tags($place->description), 300, TRUE, TRUE),
         )
@@ -31,6 +31,7 @@ function _place($pid){
   //декодируем урл места
   $url = 'http://all.culture.ru/api/1.0/places/'.$pid;
   $decode = _decode($url, FALSE); //false - значит, что мы не применяем фильтр региона
+  dsm($decode);
 
   if(sizeof($decode->place) == 0){
     return drupal_not_found();  

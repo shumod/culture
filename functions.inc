@@ -68,7 +68,7 @@ function _search($form, $form_state){
 }
 
 //получаем список всех регионов
-function _get_regions_list(){
+function _get_regions_list($type = 'select'){
   $vid = taxonomy_vocabulary_machine_name_load('locales')->vid;
   $term_rf = taxonomy_get_term_by_name('РФ');
   
@@ -79,12 +79,18 @@ function _get_regions_list(){
   $childrens = taxonomy_get_children($tid_rf, $vid);
 
   $output = array();
-  $output[$tid_rf] = $name_rf;
-  foreach ($childrens as $key => $value) {
-    $output[$key] = $value->name;
-    $output[$key]['#attributes'] = '123';
+  if($type == 'select'){
+    $output[$tid_rf] = $name_rf;
+    foreach ($childrens as $key => $value) {
+      $output[$key] = $value->name;
+    }
   }
-
+  if($type == 'list'){
+    foreach ($childrens as $key => $value) {
+      $alias = drupal_get_path_alias('taxonomy/term/' . $value->tid);
+      $output[$key] = l($value->name, 'r/' . $alias);
+    }
+  }
   return $output;
 }
 
@@ -116,18 +122,10 @@ function _decode($url, $region = TRUE, $search = ''){
     $tid_rf = $value->tid;
   }
 
-  //если мы выводим информацию в соответствии с регионом
-  if($region && isset($_SESSION['region'])){
-    if ($_SESSION['region'] != $tid_rf) {
-      $childrens = taxonomy_get_children($_SESSION['region']);
-      
-      $children = array();
-      $children[] = $_SESSION['region'];
-      foreach ($childrens as $key => $value) {
-        $children[] = $value->field_locales_id['und'][0]['value'];
-      }
-      $data_arr[] = 'locales='.implode(',', $children);
-    }
+  if($region){
+    $regions = _get_current_region(); //получаем все регионы, которые встречаются в урле
+    if($regions != '') { $data_arr[] = $regions; }
+    dsm($regions);
   }
 
   //если есть поиск, то добавляем в поиск параметры
@@ -358,8 +356,51 @@ function _set_seo_tags($keywords_array = array(), $description_string = ''){
   }
 }
 
-function _get_term_id_from_locale(){
-  return '';
+//получаем термин региона из урла
+function _get_region_term_from_url($region_url){
+  if($region_url){
+    $path = drupal_get_normal_path($region_url);
+    $parse = explode('/', $path);
+    if($parse[0] == 'taxonomy' && $parse[1] == 'term' && is_numeric($parse[2])){
+      return taxonomy_term_load($parse[2]);
+    }
+  }
+  else{
+    return drupal_not_found();
+  }
+}
+
+function _get_current_region(){
+  $url_array = explode('/', drupal_get_path_alias());
+  if($url_array[0] == 'r' && isset($url_array[1])){
+    $term = _get_region_term_from_url($url_array[1]);
+    $parent_region = $term->field_locales_id['und'][0]['value'];
+    $childrens = taxonomy_get_children($parent_region);
+
+    $children = array();
+    $children[] = $parent_region;
+    foreach ($childrens as $key => $value) {
+      $children[] = $value->field_locales_id['und'][0]['value'];
+    }
+    return 'locales='.implode(',', $children);;
+  }
+  else{
+    return drupal_not_found();
+  }
+  //если мы выводим информацию в соответствии с регионом
+  /*
+  if($region && isset($_SESSION['region'])){
+    if ($_SESSION['region'] != $tid_rf) {
+      $childrens = taxonomy_get_children($_SESSION['region']);
+      
+      $children = array();
+      $children[] = $_SESSION['region'];
+      foreach ($childrens as $key => $value) {
+        $children[] = $value->field_locales_id['und'][0]['value'];
+      }
+      $data_arr[] = 'locales='.implode(',', $children);
+    }
+  }*/
 }
 
 //форматирует номер телефона

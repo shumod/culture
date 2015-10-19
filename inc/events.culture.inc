@@ -1,7 +1,7 @@
 <?
 
 // Функции вывода событий
-function _events($region = TRUE, $search = ''){
+function _events($region, $search = ''){
   $url = 'http://all.culture.ru/api/1.0/events';
   $decode = _decode($url, $region, $search);
 
@@ -13,7 +13,7 @@ function _events($region = TRUE, $search = ''){
     foreach ($decode->events as $key => $event) {
       $output .= theme('events', 
         array(
-          'title' => l($event->name, 'events/'.$event->_id),
+          'title' => l($event->name, drupal_get_path_alias().'/'.$event->_id),
           'image' => _image($event->image->name, 'image'),
           'description' => truncate_utf8(strip_tags($event->description), 300, TRUE, TRUE),
           'price' => ($event->isFree) ? 'Событие бесплатно' : 'Событие платно. ' . _price($event->price, $event->maxPrice),
@@ -30,7 +30,7 @@ function _events($region = TRUE, $search = ''){
 }
 
 //выводит одно событие
-function _event($eid){
+function _event($region, $eid){
   //декодируем урл события
   $url = 'http://all.culture.ru/api/1.0/events?ids='.$eid;
   $decode = _decode($url, FALSE); //false - значит, что мы не применяем фильтр региона

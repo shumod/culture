@@ -370,6 +370,7 @@ function _get_region_term_from_url($region_url){
   }
 }
 
+//получает текущий регион
 function _get_current_region(){
   $url_array = explode('/', drupal_get_path_alias());
   if($url_array[0] == 'r' && isset($url_array[1])){
@@ -401,6 +402,33 @@ function _get_current_region(){
       $data_arr[] = 'locales='.implode(',', $children);
     }
   }*/
+}
+
+//возвращает url термина таксономии региона.
+function _return_current_region_url($region = array()){
+  $region_id = 0;
+  $region_url = '';
+  if(sizeof($region) > 0){
+    if(sizeof($region) == 2){
+      $region_id = $region[0];
+    }
+    else if(sizeof($region) == 3){
+      $region_id = $region[1];
+    }
+  }
+  else{
+    return drupal_not_found();
+  }
+
+  $term_id = db_select('field_data_field_locales_id', 'f')
+    ->fields('f', array('entity_id'))
+    ->condition('f.field_locales_id_value', $region_id)
+    ->execute()
+    ->fetchField();  
+
+  $region_url = drupal_get_path_alias('taxonomy/term/'.$term_id);
+
+  return $region_url;
 }
 
 //форматирует номер телефона

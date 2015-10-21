@@ -11,9 +11,11 @@ function _events($region, $search = ''){
   }
   else{
     foreach ($decode->events as $key => $event) {
+      $region_url = _return_current_region_url($event->localeIds);
+      $event_url = 'r/' . $region_url . '/events/' . $event->_id;
       $output .= theme('events', 
         array(
-          'title' => l($event->name, drupal_get_path_alias().'/'.$event->_id),
+          'title' => l($event->name, $event_url),
           'image' => _image($event->image->name, 'image'),
           'description' => truncate_utf8(strip_tags($event->description), 300, TRUE, TRUE),
           'price' => ($event->isFree) ? 'Событие бесплатно' : 'Событие платно. ' . _price($event->price, $event->maxPrice),

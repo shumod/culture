@@ -375,11 +375,11 @@ function _get_current_region(){
   $url_array = explode('/', drupal_get_path_alias());
   if($url_array[0] == 'r' && isset($url_array[1])){
     $term = _get_region_term_from_url($url_array[1]);
-    $parent_region = $term->field_locales_id['und'][0]['value'];
+    $parent_region = $term->tid;
     $childrens = taxonomy_get_children($parent_region);
 
     $children = array();
-    $children[] = $parent_region;
+    $children[] = $term->field_locales_id['und'][0]['value'];
     foreach ($childrens as $key => $value) {
       $children[] = $value->field_locales_id['und'][0]['value'];
     }
@@ -429,6 +429,29 @@ function _return_current_region_url($region = array()){
   $region_url = drupal_get_path_alias('taxonomy/term/'.$term_id);
 
   return $region_url;
+}
+
+function culture_taxonomy_term_view($term, $view_mode, $langcode){
+  $childrens = '';
+  $childrens_array = taxonomy_get_children($term->tid);
+  if(sizeof($childrens_array) > 0){
+    $header = array('Регион', 'Id');
+    foreach ($childrens_array as $key => $children) {
+      $rows[$key][] = l($children->name, 'taxonomy/term/' . $children->tid);
+      $rows[$key][] = $children->field_locales_id['und'][0]['value'];
+    }
+    $table = theme('table', array(
+      'header' => $header, 
+      'rows' => $rows, 
+    ));
+  }
+  else{
+    $table = 'Дочерних регионов не найдено';
+  }
+  $term->content['childrens'] = array(
+    '#markup' => $table,
+    '#weight' => 10,
+  );
 }
 
 //форматирует номер телефона

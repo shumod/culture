@@ -11,8 +11,14 @@ function _regions(){
 //возвращает регион
 function _region($region_url){	
 	$output = '';
-	$output .= l('Места', 'r/' . $region_url . '/places');
-	$output .= l('События', 'r/' . $region_url . '/events');
+	dsm($region_url);
+	$output .= theme('region', 
+		array(
+		  'title' => 'test',
+		  'places' => l('Места', 'r/' . $region_url . '/places'),
+		  'events' => l('События', 'r/' . $region_url . '/events'),
+		)
+	);
 
 	return $output;
 }

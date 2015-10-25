@@ -437,7 +437,8 @@ function culture_taxonomy_term_view($term, $view_mode, $langcode){
   if(sizeof($childrens_array) > 0){
     $header = array('Регион', 'Id');
     foreach ($childrens_array as $key => $children) {
-      $rows[$key][] = l($children->name, 'taxonomy/term/' . $children->tid);
+      $url = 'r/'.drupal_get_path_alias('taxonomy/term/'.$children->tid);
+      $rows[$key][] = l($children->name, $url);
       $rows[$key][] = $children->field_locales_id['und'][0]['value'];
     }
     $table = theme('table', array(

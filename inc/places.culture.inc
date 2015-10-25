@@ -29,11 +29,11 @@ function _places($region = TRUE, $search = ''){
   return $output;
 }
 
+//отображение страницы с местом
 function _place($region, $pid){
   //декодируем урл места
   $url = 'http://all.culture.ru/api/1.0/places/'.$pid;
   $decode = _decode($url, FALSE); //false - значит, что мы не применяем фильтр региона
-  dsm($decode);
 
   if(sizeof($decode->place) == 0){
     return drupal_not_found();  
@@ -77,17 +77,5 @@ function _place($region, $pid){
     _set_seo_tags($keywords_array);
 
     return $output;
-  }
-}
-
-function _seo_places($term_url){
-  $url = drupal_lookup_path('source', $term_url);
-  if($url){
-    $args = explode('/', $url);
-    dsm($args);
-    return $url;    
-  }
-  else{
-    return drupal_not_found();
   }
 }

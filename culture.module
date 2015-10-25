@@ -1,6 +1,7 @@
 <?php
 
 module_load_include('inc', 'culture', 'functions');
+module_load_include('inc', 'culture', 'inc/search');
 
 /**
  * Implements hook_menu().
@@ -11,7 +12,7 @@ function culture_menu() {
     'title' => 'Все регионы',
     'page callback' => '_regions',
     'access arguments' => array('administer site configuration'),
-    'file' => 'inc/region.inc',  
+    'file' => 'inc/regionpage.culture.inc',  
     'type' => MENU_NORMAL_ITEM,
   );
   $items['r/%'] = array(
@@ -20,7 +21,7 @@ function culture_menu() {
     'page callback' => '_region',
     'access arguments' => array('administer site configuration'),
     'page arguments' => array(1),
-    'file' => 'inc/region.inc',  
+    'file' => 'inc/regionpage.culture.inc',  
     'type' => MENU_NORMAL_ITEM,
   ); 
 
@@ -58,23 +59,6 @@ function culture_menu() {
     'file' => 'inc/events.culture.inc',
     'type' => MENU_NORMAL_ITEM,
   );
-
-  //организации
-  $items['organizations'] = array(
-    'title' => 'Организации',
-    'page callback' => '_organizations',
-    'access arguments' => array('administer site configuration'),
-    'file' => 'inc/organizations.culture.inc',
-    'type' => MENU_NORMAL_ITEM,
-  );
-
-  $items['organizations/%'] = array(
-    'page callback' => '_organization',
-    'page arguments' => array(1),
-    'access arguments' => array('administer site configuration'),
-    'file' => 'inc/organizations.culture.inc',
-    'type' => MENU_NORMAL_ITEM,
-  ); 
 
   //локали
   $items['reload-locales'] = array(
@@ -166,11 +150,11 @@ function culture_theme() {
     ),
 
     //темплейт для страницы организации
-    'organization' => array(
+    'regionpage' => array(
       'variables' => array(
         'title' => NULL,
       ),
-      'template' => 'templates/organization',
+      'template' => 'templates/regionpage',
     ),
 
   );
@@ -197,12 +181,6 @@ function culture_block_info() {
 function culture_block_view($delta = '') {
   $block = array();
   switch ($delta) {
-    case 'culture-region':
-      $block['subject'] = 'Выберите регион';
-      //рендерим форму выбора региона
-      $block['content'] = drupal_render(drupal_get_form('_select_region_form'));
-      break;
-
     case 'culture-search':
       $block['subject'] = 'Поиск';
       //рендерим форму выбора региона

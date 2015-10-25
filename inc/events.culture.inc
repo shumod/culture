@@ -1,9 +1,9 @@
 <?
 
 // Функции вывода событий
-function _events($region, $search = ''){
+function _events($region, $search = '', $limit = 20, $pager = TRUE){
   $url = 'http://all.culture.ru/api/1.0/events';
-  $decode = _decode($url, $region, $search);
+  $decode = _decode($url, $region, $search, $limit);
 
   $output = '';
   if ($decode->total == 0) {
@@ -24,8 +24,8 @@ function _events($region, $search = ''){
       );
     }
 
-    $pager = _pager($decode->total);
-    $output .= $pager;
+  $output .= ($pager) ? _pager($decode->total) : '';
+
   }
 
   return $output;
@@ -35,7 +35,7 @@ function _events($region, $search = ''){
 function _event($region, $eid){
   //декодируем урл события
   $url = 'http://all.culture.ru/api/1.0/events?ids='.$eid;
-  $decode = _decode($url, FALSE); //false - значит, что мы не применяем фильтр региона
+  $decode = _decode($url, FALSE, '', 0); //false - значит, что мы не применяем фильтр региона
 
   if(sizeof($decode->events) == 0){
     return drupal_not_found();  

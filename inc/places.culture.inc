@@ -1,9 +1,9 @@
 <?
 
 // Функции вывода мест
-function _places($region = TRUE, $search = ''){
+function _places($region = TRUE, $search = '', $limit = 20, $pager = TRUE){
   $url = 'http://all.culture.ru/api/1.0/places';
-  $decode = _decode($url, $region, $search);
+  $decode = _decode($url, $region, $search, $limit);
 
   $items = array();
   $output = '';
@@ -23,8 +23,8 @@ function _places($region = TRUE, $search = ''){
       );
     }
 
-    $pager = _pager($decode->total);
-    $output .= $pager;
+  $output .= ($pager) ? _pager($decode->total) : '';
+
   }
   return $output;
 }
@@ -32,7 +32,7 @@ function _places($region = TRUE, $search = ''){
 function _place($region, $pid){
   //декодируем урл места
   $url = 'http://all.culture.ru/api/1.0/places/'.$pid;
-  $decode = _decode($url, FALSE); //false - значит, что мы не применяем фильтр региона
+  $decode = _decode($url, FALSE, '', 0); //false - значит, что мы не применяем фильтр региона
   dsm($decode);
 
   if(sizeof($decode->place) == 0){

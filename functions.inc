@@ -1,72 +1,5 @@
 <?
 
-//выводит форму с регионами из словаря
-function _select_region_form($form, &$form_state){
-  $form = array();
-
-  $session = (isset($_SESSION['region'])) ? $_SESSION['region'] : 0 ;
-
-  $form['#prefix'] = '<div id="reload-region">';
-  $form['#suffix'] = '</div>';
-
-  $form['region'] = array(
-    '#type' => 'select',
-    '#options' => _get_regions_list(),
-    '#default_value' => $session,
-  );
-  $form['region-cookies'] = array(
-    '#markup' => '<div id="region-cookies"></div>',
-  );
-
-  return $form;
-}
-
-function _set_region($region_id){
-  if(!is_numeric($region_id)){
-    return drupal_not_found();
-  }
-  else{
-    $_SESSION['region'] = $region_id;
-    drupal_goto($_GET['destination']);
-  }
-}
-
-//форма поиска
-function _search_form($form, &$form_state){
-  $form = array();
-
-  $default_text = (isset($_GET['text'])) ? $_GET['text'] : '';
-  $form['search-text'] = array(
-    '#type' => 'textfield', 
-    '#title' => 'Что ищем?', 
-    '#size' => 30, 
-    '#maxlength' => 128, 
-    '#required' => TRUE,
-    '#default_value' => $default_text,
-  );
-
-  $default_type = (isset($_GET['type'])) ? $_GET['type'] : 'События';
-  $form['search-type'] = array(
-    '#type' => 'radios',
-    '#options' => drupal_map_assoc(array('События', 'Места')),
-    '#default_value' => $default_type,
-  );
-  $form['search-submit'] = array(
-    '#type' => 'submit',
-    '#value' => 'Искать',       
-    '#submit' => array('_search'),
-  );
-
-  return $form;
-}
-
-function _search($form, $form_state){
-  $options = array();
-  $options['query']['text'] = $form_state['values']['search-text'];
-  $options['query']['type'] = $form_state['values']['search-type'];
-  drupal_goto('search', $options);
-}
-
 //получаем список всех регионов
 function _get_regions_list($type = 'select'){
   $vid = taxonomy_vocabulary_machine_name_load('locales')->vid;
@@ -108,12 +41,12 @@ function _pager($total){
 }
 
 //функция декодирует урл и возвращает массив, с которым можно работать
-function _decode($url, $region = TRUE, $search = ''){
+function _decode($url, $region = TRUE, $search = '', $limit = 20){
 
   //функции для пейджера
   $data_arr = array();
   if(isset($_GET['page'])){
-    $offset = $_GET['page']*20;
+    $offset = $_GET['page']*$limit;
     $data_arr[] = 'offset='.$offset;
   }
 
@@ -125,12 +58,16 @@ function _decode($url, $region = TRUE, $search = ''){
   if($region){
     $regions = _get_current_region(); //получаем все регионы, которые встречаются в урле
     if($regions != '') { $data_arr[] = $regions; }
-    dsm($regions);
   }
 
   //если есть поиск, то добавляем в поиск параметры
   if($search != ''){
     $data_arr[] = 'nameQuery=' . $search;
+  }
+
+  //указываем лимит выдачи 
+  if($limit){
+    $data_arr[] = 'limit=' . $limit;
   }
 
   //собираем массив параметров для запроса
@@ -370,7 +307,7 @@ function _get_region_term_from_url($region_url){
   }
 }
 
-//получает текущий регион
+//получает текущий регион. обратно отдаёт список текущей локали и дочерних.
 function _get_current_region(){
   $url_array = explode('/', drupal_get_path_alias());
   if($url_array[0] == 'r' && isset($url_array[1])){

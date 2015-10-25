@@ -46,6 +46,8 @@ function _event($region, $eid){
     $image = $event->image;                                 //получаем картинку события
     $name = $event->name;                                   //получаем название события
     $place = ($event->place) ? $event->place->name : NULL;  //если есть место проведения, то место
+    $region_url = _return_current_region_url($event->localeIds);
+    $place_url = ($event->place) ? 'r/' . $region_url . '/places/' . $event->place->_id : NULL;
     $category = $event->category->name;                     //название категории события
     $X = $event->address->mapPosition->coordinates[0];      //координаты
     $Y = $event->address->mapPosition->coordinates[1];     
@@ -65,7 +67,7 @@ function _event($region, $eid){
         'seances' => _seances_all($event->seances),
         'price' => ($event->isFree) ? 'Событие бесплатно' : 'Событие платно. ' . _price($event->price, $event->maxPrice),
         'persons' => (isset($event->extraFields->persons)) ? _extra($event->extraFields->persons) : '',
-        'place' => ($event->place != NULL) ? l($event->place->name, 'places/'.$event->place->_id) : '',
+        'place' => ($event->place != NULL) ? l($event->place->name, $place_url) : '',
         'map' => _map($X, $Y, $name, $street, $address_comment),
         'organization' => l($event->organization->name, 'organizations/'.$event->organization->_id),
         'gallery' => isset($event->gallery) ? _gallery($event->gallery) : NULL,

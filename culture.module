@@ -11,7 +11,7 @@ function culture_menu() {
     'title' => 'Все регионы',
     'page callback' => '_regions',
     'access arguments' => array('administer site configuration'),
-    'file' => 'inc/regionpage.inc',  
+    'file' => 'inc/region.inc',  
     'type' => MENU_NORMAL_ITEM,
   );
   $items['r/%'] = array(
@@ -20,7 +20,7 @@ function culture_menu() {
     'page callback' => '_region',
     'access arguments' => array('administer site configuration'),
     'page arguments' => array(1),
-    'file' => 'inc/regionpage.inc',  
+    'file' => 'inc/region.inc',  
     'type' => MENU_NORMAL_ITEM,
   ); 
 
@@ -33,6 +33,7 @@ function culture_menu() {
     'file' => 'inc/places.culture.inc',  
     'type' => MENU_NORMAL_ITEM,
   );
+
   $items['r/%/places/%'] = array(
     'page callback' => '_place',
     'page arguments' => array(1,3),
@@ -170,14 +171,6 @@ function culture_theme() {
         'title' => NULL,
       ),
       'template' => 'templates/organization',
-    ),
-
-    //темплейт для страницы места
-    'regionpage' => array(
-      'variables' => array(
-        'title' => NULL,
-      ),
-      'template' => 'templates/regionpage',
     ),
 
   );

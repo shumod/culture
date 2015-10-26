@@ -12,13 +12,22 @@ function _places($region = TRUE, $search = '', $limit = 20, $pager = TRUE){
   }
   else{
     foreach ($decode->places as $key => $place) {
+      $classes = array();
+      $classes[] = 'row';
+      if($key == 0){
+        $classes[] = 'first';
+      }
+      elseif ($key == $limit - 1) {
+        $classes[] = 'last';
+      }
       $region_url = _return_current_region_url($place->localeIds);
       $place_url = 'r/' . $region_url . '/places/' . $place->_id;
       $output .= theme('places', 
         array(
-          'title' => l($place->name, $place_url),
+          'title' => l(truncate_utf8($place->name, 100, TRUE, TRUE), $place_url),
           'image' => _image($place->image->name, 'image'),
           'description' => truncate_utf8(strip_tags($place->description), 300, TRUE, TRUE),
+          'entity_class' => implode(' ', $classes),
         )
       );
     }

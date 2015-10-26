@@ -11,6 +11,14 @@ function _events($region, $search = '', $limit = 20, $pager = TRUE){
   }
   else{
     foreach ($decode->events as $key => $event) {
+      $classes = array();
+      $classes[] = 'row';
+      if($key == 0){
+        $classes[] = 'first';
+      }
+      elseif ($key == $limit - 1) {
+        $classes[] = 'last';
+      }
       $region_url = _return_current_region_url($event->localeIds);
       $event_url = 'r/' . $region_url . '/events/' . $event->_id;
       $output .= theme('events', 
@@ -20,6 +28,7 @@ function _events($region, $search = '', $limit = 20, $pager = TRUE){
           'description' => truncate_utf8(strip_tags($event->description), 300, TRUE, TRUE),
           'price' => ($event->isFree) ? 'Событие бесплатно' : 'Событие платно. ' . _price($event->price, $event->maxPrice),
           'seance' => _seances_from_to($event->seances),
+          'entity_class' => implode(' ', $classes),
         )
       );
     }

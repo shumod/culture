@@ -129,6 +129,15 @@ function culture_menu() {
 }
 
 /**
+ * Implements hook_menu_alter().
+ */
+function culture_menu_link_alter(&$link) {
+  if ($link['link_title'] == 'Статьи') {
+    dsm($link);
+  }
+}
+
+/**
  * Implements hook_theme.
  */
 function culture_theme() {

@@ -12,6 +12,14 @@ function _articles($region = FALSE, $search = '', $limit = 20, $pager = TRUE){
   }
   else{
     foreach ($decode->articles as $key => $article) {
+      $classes = array();
+      $classes[] = 'row';
+      if($key == 0){
+        $classes[] = 'first';
+      }
+      elseif ($key == $limit - 1) {
+        $classes[] = 'last';
+      }
       $region_url = _return_current_region_url($article->localeIds);
       $article_url = '/articles/' . $article->_id;
       $created = date('d.m.Y', $article->createDate / 1000);
@@ -27,6 +35,7 @@ function _articles($region = FALSE, $search = '', $limit = 20, $pager = TRUE){
           'image' => _image($article->image->name, 'image'),
           'text' => truncate_utf8(strip_tags($text), 500, TRUE, TRUE),
           'created' => $created,
+          'entity_class' => implode(' ', $classes),
         )
       );
     }

@@ -15,3 +15,4 @@ scripts[] = js/carousel/owl.carousel.js
 
 stylesheets[all][] = js/carousel/owl.carousel.css
 stylesheets[all][] = js/carousel/owl.theme.css
+stylesheets[all][] = css/style.culture.css

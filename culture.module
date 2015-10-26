@@ -60,6 +60,23 @@ function culture_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
+  //статьи
+  $items['articles'] = array(
+    'title' => 'Статьи',
+    'page callback' => '_articles',
+    'access arguments' => array('administer site configuration'),
+    'file' => 'inc/articles.culture.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['articles/%'] = array(
+    'page callback' => '_article',
+    'page arguments' => array(1),
+    'access arguments' => array('administer site configuration'),
+    'file' => 'inc/articles.culture.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+
   //локали
   $items['reload-locales'] = array(
     'title' => 'Обновление списка локалей',
@@ -147,6 +164,22 @@ function culture_theme() {
         'title' => NULL,
       ),
       'template' => 'templates/event',
+    ),
+
+    //темплейт для страниц статей
+    'articles' => array(
+      'variables' => array(
+        'title' => NULL,
+      ),
+      'template' => 'templates/articles',
+    ),
+
+    //темплейт для страницы статьи
+    'article' => array(
+      'variables' => array(
+        'title' => NULL,
+      ),
+      'template' => 'templates/article',
     ),
 
     //темплейт для страницы организации

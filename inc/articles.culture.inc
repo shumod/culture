@@ -14,7 +14,7 @@ function _articles($region = FALSE, $search = '', $limit = 20, $pager = TRUE){
     foreach ($decode->articles as $key => $article) {
       $region_url = _return_current_region_url($article->localeIds);
       $article_url = '/articles/' . $article->_id;
-      $created = date('d.m.Y', $article->createDate);
+      $created = date('d.m.Y', $article->createDate / 1000);
       $text = '';
       foreach ($article->content as $key => $content) {
         if ($content->type == 'text') {
@@ -55,7 +55,7 @@ function _article($aid){
     $organization = ($article->organization) ? $article->organization->name : NULL;  //если есть место проведения, то место
     $region_url = _return_current_region_url($article->localeIds);
     $category = $article->category->name;                     //название категории события
-    $created = date('d.m.Y', $article->createDate);
+    $created = date('d.m.Y', $article->createDate / 1000);
     $text = '';
     $images_array = array();
     foreach ($article->content as $key => $content) {

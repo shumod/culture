@@ -2,6 +2,7 @@
 
 module_load_include('inc', 'culture', 'inc/places.culture');
 module_load_include('inc', 'culture', 'inc/events.culture');
+module_load_include('inc', 'culture', 'inc/articles.culture');
 
 function _search_page(){
 	$output = 'Информации по заданным условиям не найдено';
@@ -22,6 +23,9 @@ function _search_page(){
 			case 'События':
 				$output = _events(FALSE, $search_text);
 				break;
+			case 'Статьи':
+				$output = _articles(FALSE, $search_text);
+				break;
 		}
 	}
 	return $help . $output;
@@ -33,8 +37,11 @@ function _get_search_title($type = ''){
 		if($type == 'Места'){
 			$title = 'Поиск по местам';
 		}
-		elseif($type == 'События'){
+		else if($type == 'События'){
 			$title = 'Поиск по событиям';
+		}
+		else if($type == 'Статьи'){
+			$title = 'Поиск по статьям';
 		}
 		else{
 			$title = 'Поиск';
@@ -61,7 +68,7 @@ function _search_form($form, &$form_state){
   $default_type = (isset($_GET['type'])) ? $_GET['type'] : 'События';
   $form['search-type'] = array(
     '#type' => 'radios',
-    '#options' => drupal_map_assoc(array('События', 'Места')),
+    '#options' => drupal_map_assoc(array('События', 'Места', 'Статьи')),
     '#default_value' => $default_type,
   );
   $form['search-submit'] = array(

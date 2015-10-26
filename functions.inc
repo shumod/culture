@@ -355,29 +355,6 @@ function _return_current_region_url($region = array()){
   return $region_url;
 }
 
-function culture_taxonomy_term_view($term, $view_mode, $langcode){
-  $childrens = '';
-  $childrens_array = taxonomy_get_children($term->tid);
-  if(sizeof($childrens_array) > 0){
-    $header = array('Регион', 'Id');
-    foreach ($childrens_array as $key => $children) {
-      $rows[$key][] = l($children->name, 'taxonomy/term/' . $children->tid);
-      $rows[$key][] = $children->field_locales_id['und'][0]['value'];
-    }
-    $table = theme('table', array(
-      'header' => $header, 
-      'rows' => $rows, 
-    ));
-  }
-  else{
-    $table = 'Дочерних регионов не найдено';
-  }
-  $term->content['childrens'] = array(
-    '#markup' => $table,
-    '#weight' => 10,
-  );
-}
-
 //форматирует номер телефона
 function _format_phone($phone = '', $convert = false, $trim = true){
   // If we have not entered a phone number just return empty

@@ -29,11 +29,6 @@ function _region($region_url){
 	return $output;
 }
 
-function _region_title($region_url){
-	$title = _get_region_term_from_url($region_url)->name;
-	return $title;
-}
-
 function _region_places($region, $search, $limit, $pager){
 	$output = '';
 
@@ -48,7 +43,6 @@ function _region_events($region, $search, $limit, $pager){
 	$output = '';
 
 	$reg = _get_current_region();
-	//dsm($reg);
 
 	$output .= '<h2>' . l('Все события', drupal_get_path_alias().'/events') . '</h2>';
 	$output .= _events($region, $search, $limit, $pager);

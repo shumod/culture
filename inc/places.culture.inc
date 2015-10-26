@@ -33,7 +33,6 @@ function _place($region, $pid){
   //декодируем урл места
   $url = 'http://all.culture.ru/api/1.0/places/'.$pid;
   $decode = _decode($url, FALSE, '', 0); //false - значит, что мы не применяем фильтр региона
-  dsm($decode);
 
   if(sizeof($decode->place) == 0){
     return drupal_not_found();  

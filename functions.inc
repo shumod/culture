@@ -50,11 +50,6 @@ function _decode($url, $region = TRUE, $search = '', $limit = 20){
     $data_arr[] = 'offset='.$offset;
   }
 
-  $term_rf = taxonomy_get_term_by_name('РФ');
-  foreach ($term_rf as $value) {
-    $tid_rf = $value->tid;
-  }
-
   if($region){
     $regions = _get_current_region(); //получаем все регионы, которые встречаются в урле
     if($regions != '') { $data_arr[] = $regions; }
@@ -310,35 +305,27 @@ function _get_region_term_from_url($region_url){
 //получает текущий регион. обратно отдаёт список текущей локали и дочерних.
 function _get_current_region(){
   $url_array = explode('/', drupal_get_path_alias());
+
+  //если урл правильный
   if($url_array[0] == 'r' && isset($url_array[1])){
     $term = _get_region_term_from_url($url_array[1]);
     $parent_region = $term->tid;
     $childrens = taxonomy_get_children($parent_region);
 
-    $children = array();
-    $children[] = $term->field_locales_id['und'][0]['value'];
-    foreach ($childrens as $key => $value) {
-      $children[] = $value->field_locales_id['und'][0]['value'];
+    //если термин - это не РФ
+    if($term->name != 'РФ'){
+      $children = array();
+      $children[] = $term->field_locales_id['und'][0]['value'];
+      foreach ($childrens as $key => $value) {
+        $children[] = $value->field_locales_id['und'][0]['value'];
+      }
+      return 'locales='.implode(',', $children);
     }
-    return 'locales='.implode(',', $children);;
+    else{ return ''; }
   }
   else{
     return drupal_not_found();
   }
-  //если мы выводим информацию в соответствии с регионом
-  /*
-  if($region && isset($_SESSION['region'])){
-    if ($_SESSION['region'] != $tid_rf) {
-      $childrens = taxonomy_get_children($_SESSION['region']);
-      
-      $children = array();
-      $children[] = $_SESSION['region'];
-      foreach ($childrens as $key => $value) {
-        $children[] = $value->field_locales_id['und'][0]['value'];
-      }
-      $data_arr[] = 'locales='.implode(',', $children);
-    }
-  }*/
 }
 
 //возвращает url термина таксономии региона.

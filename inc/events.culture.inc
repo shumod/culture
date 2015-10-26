@@ -24,8 +24,7 @@ function _events($region, $search = '', $limit = 20, $pager = TRUE){
       );
     }
 
-  $output .= ($pager) ? _pager($decode->total) : '';
-
+    $output .= ($pager) ? _pager($decode->total) : '';
   }
 
   return $output;

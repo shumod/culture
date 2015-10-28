@@ -185,8 +185,8 @@ function _map($coordinateX, $coordinateY, $name, $street, $comment){
         }
   ', array('type' => 'inline', 'scope' => 'footer', 'weight' => 5));
   $output = '';
-  $output .= '<div id="coordinates">Координаты:<br /> ';
-  $output .= '<span id="coordinate-x">X: '.$coordinateX.'</span><br />';
+  $output .= '<div id="coordinates"><span id="coordinate-label" class="label">Координаты:</span> ';
+  $output .= '<span id="coordinate-x">X: '.$coordinateX.'</span>';
   $output .= '<span id="coordinate-y">Y: '.$coordinateY.'</span>';
   $output .= '</div>';
 

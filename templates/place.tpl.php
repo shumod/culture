@@ -1,11 +1,11 @@
 <h1 class="title"><?php print $title;?></h1>
-<div class="place-address">Адрес: <?php print $address;?></div>
 <div class="place-image"><?php print $image;?></div>
+<div class="place-address"><?php print $address;?></div>
 <div class="place-description"><?php print $description;?></div>
-<div class="place-organization">Организация: <?php print $organization;?></div>
-<div class="place-category">Категория: <?php print $category;?></div>
+<div class="place-organization"><?php print $organization;?></div>
+<div class="place-category"><?php print $category;?></div>
 <div class="place-tags"><?php print $tags;?></div>
-<div class="place-locale">Локаль: <?php print $locale;?></div>
+<div class="place-locale"><?php print $locale;?></div>
 <div class="place-contacts"><?php print $contacts;?></div>
 <div class="place-schedule"><?php print $schedule;?></div>
 <div class="place-map"><?php print $map;?></div>

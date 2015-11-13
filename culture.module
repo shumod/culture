@@ -215,6 +215,10 @@ function culture_block_info() {
     'info' => 'Поиск по событиям',
     'cache' => DRUPAL_NO_CACHE,
   );
+  $blocks['culture-menu'] = array(
+    'info' => 'Меню',
+    'cache' => DRUPAL_NO_CACHE,
+  );
   return $blocks;
 }
  
@@ -228,6 +232,25 @@ function culture_block_view($delta = '') {
       $block['subject'] = 'Поиск';
       //рендерим форму выбора региона
       $block['content'] = drupal_render(drupal_get_form('_search_form'));
+      break;
+
+    case 'culture-menu':
+      $block['subject'] = '';
+      //берём меню и правим его, если нужно
+      $region = (isset($_SESSION['region'])) ? $_SESSION['region'] : FALSE ;
+      $menu = menu_tree('main-menu');
+      foreach ($menu as $key => $value) {
+        if(isset($value['#href']) && $region){
+          $href = drupal_parse_url($value['#href']);
+          $path = explode('/', $href['path']);
+          if($path[0] == 'r' && $path[1]){
+            $path[1] = $region;
+          }
+          $menu[$key]['#href'] = implode('/', $path);
+        }
+      }
+
+      $block['content'] = render($menu);
       break;
   }
   return $block;

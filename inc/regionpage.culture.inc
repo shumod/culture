@@ -18,6 +18,7 @@ function _region($region_url){
 	$search = '';
 	$limit = 3;
 	$pager = FALSE;
+	$_SESSION['region'] = arg(1);
 
 	$output .= theme('regionpage', 
 		array(

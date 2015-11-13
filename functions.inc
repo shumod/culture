@@ -18,10 +18,18 @@ function _get_regions_list($type = 'select'){
       $output[$key] = $value->name;
     }
   }
+  $first_letter = '';
   if($type == 'list'){
     foreach ($childrens as $key => $value) {
+      $first_value = truncate_utf8($value->name, 1);
+      if($first_letter != $first_value){
+        $output[$key.'_letter']['data'] = mb_strtoupper($first_value);
+        $output[$key.'_letter']['class'] = array('first-letter');        
+        $first_letter = $first_value;
+      }
       $alias = drupal_get_path_alias('taxonomy/term/' . $value->tid);
-      $output[$key] = l($value->name, 'r/' . $alias);
+      $output[$key]['data'] = l($value->name, 'r/' . $alias);
+      $output[$key]['class'] = array('class'.$key);
     }
   }
   return $output;

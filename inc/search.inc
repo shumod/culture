@@ -58,7 +58,6 @@ function _search_form($form, &$form_state){
   $default_text = (isset($_GET['text'])) ? $_GET['text'] : '';
   $form['search-text'] = array(
     '#type' => 'textfield', 
-    '#title' => 'Что ищем?', 
     '#size' => 20, 
     '#maxlength' => 128, 
     '#required' => TRUE,

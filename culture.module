@@ -222,7 +222,10 @@ function culture_block_view($delta = '') {
     case 'culture-search':
       $block['subject'] = 'Поиск';
       //рендерим форму выбора региона
-      $block['content'] = drupal_render(drupal_get_form('_search_form'));
+      $form = drupal_get_form('_search_form');
+      $block['content'] = array(
+        '#markup' => drupal_render($form),
+      );
       break;
 
     case 'culture-menu':
@@ -276,4 +279,21 @@ function culture_taxonomy_term_view($term, $view_mode, $langcode){
     '#markup' => $table,
     '#weight' => 10,
   );
+}
+
+// template_preprocess_node(&$variables)
+function culture_preprocess_page(&$variables){
+  $variables['region_text'] = 1;
+  $region = (isset($_SESSION['region'])) ? $_SESSION['region'] : FALSE;
+  $choose_region = ' (' . l('Выберите регион', '<front>') . ')';
+  if($region){
+    $region_term = _get_region_term_from_url($region);
+    $region_name = l($region_term->name, 'r/' . $region);
+
+    $variables['region_text'] = $region_name . $choose_region;
+  }
+  else{
+    $variables['region_text'] = 'Регион не выбран' . $choose_region;
+  }
+  dsm($_SESSION);
 }

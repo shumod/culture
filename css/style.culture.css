@@ -1,3 +1,54 @@
+/*
+ * Header menu
+ */
+ #main-menu {
+    margin: 33px 0px 15px !important;
+}
+.region-preface-first li{
+	float: left;
+	list-style-type: none !important;
+	list-style-image: none !important;
+	margin-right: 20px !important;
+}
+.region-preface-first li a{
+	color: #FFF;
+	font-size: 20px;
+}
+.region-preface-first li a:hover{
+	text-decoration: underline;
+}
+#preface-area{
+	padding: 10px 0 0px !important;
+}
+.form-item-search-text{
+	width: auto;
+    text-align: left;
+    margin-right: 20px;
+    float: left;
+}
+#edit-search-type{
+	width: auto;
+	float: left;
+	margin-right: 20px;
+}
+#edit-search-type .form-item-search-type{
+	float: left;
+	margin-right: 20px;
+}
+#edit-search-type .form-item-search-type input{
+	margin-top: 0px;
+}
+.preface-block .block{
+	margin: 0px !important;
+}
+.preface-block ul{
+	margin: 0px !important;
+	padding-top: 5px;
+}
+/*
+ * /Header menu
+ */
+
 .entity-image{
 	float: left;
 	padding-right: 10px;
@@ -24,24 +75,6 @@
 .seance{
 	font-size: 10px;
 }
-.form-item-search-text{
-	width: auto;
-    float: left;
-    margin-right: 20px;
-}
-#edit-search-type{
-	width: auto;
-	float: left;
-	margin-right: 20px;
-}
-#edit-search-type .form-item-search-type{
-	float: left;
-	margin-right: 20px;
-}
-#edit-search-type .form-item-search-type input{
-	margin-top: 0px;
-}
-
 
 
 /*

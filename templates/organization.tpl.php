@@ -1,1 +1,0 @@
-<h1 class="title"><?php print $title;?></h1>

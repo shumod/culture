@@ -1,68 +1,129 @@
 <?php
 
+module_load_include('inc', 'culture', 'functions');
+module_load_include('inc', 'culture', 'inc/search');
+
 /**
  * Implements hook_menu().
  */
 function culture_menu() {
- 
+  //регионы
+  $items['r'] = array(
+    'title' => 'Все регионы',
+    'page callback' => '_regions',
+    'access arguments' => array('access content'), 
+    'file' => 'inc/regionpage.culture.inc',  
+    'type' => MENU_NORMAL_ITEM,
+  );
+  $items['r/%'] = array(
+    'title callback' => '_region_title',
+    'title arguments' => array(1),
+    'page callback' => '_region',
+    'access arguments' => array('access content'),
+    'page arguments' => array(1),
+    'file' => 'inc/regionpage.culture.inc',  
+    'type' => MENU_NORMAL_ITEM,
+  ); 
+
   //места
-  $items['places'] = array(
+  $items['r/%/places'] = array(
     'title' => 'Места',
     'page callback' => '_places',
-    'access arguments' => array('administer site configuration'),
+    'access arguments' => array('access content'),
+    'page arguments' => array(1),
     'file' => 'inc/places.culture.inc',  
     'type' => MENU_NORMAL_ITEM,
   );
 
-  $items['places/%'] = array(
+  $items['r/%/places/%'] = array(
     'page callback' => '_place',
-    'page arguments' => array(1),
-    'access arguments' => array('administer site configuration'),
+    'page arguments' => array(1,3),
+    'access arguments' => array('access content'),
     'file' => 'inc/places.culture.inc',
-    'type' => MENU_NORMAL_ITEM,
   );
 
   //события
-  $items['events'] = array(
+  $items['r/%/events'] = array(
     'title' => 'События',
     'page callback' => '_events',
-    'access arguments' => array('administer site configuration'),
+    'access arguments' => array('access content'),
+    'page arguments' => array(1),
     'file' => 'inc/events.culture.inc',
     'type' => MENU_NORMAL_ITEM,
   );
 
-  $items['events/%'] = array(
+  $items['r/%/events/%'] = array(
     'page callback' => '_event',
-    'page arguments' => array(1),
-    'access arguments' => array('administer site configuration'),
+    'page arguments' => array(1,3),
+    'access arguments' => array('access content'),
     'file' => 'inc/events.culture.inc',
     'type' => MENU_NORMAL_ITEM,
   );
 
-  //организации
-  $items['organizations'] = array(
-    'title' => 'Организации',
-    'page callback' => '_organizations',
-    'access arguments' => array('administer site configuration'),
-    'file' => 'inc/organizations.culture.inc',
+  //статьи
+  $items['articles'] = array(
+    'title' => 'Статьи',
+    'page callback' => '_articles',
+    'access arguments' => array('access content'),
+    'file' => 'inc/articles.culture.inc',
     'type' => MENU_NORMAL_ITEM,
   );
 
-  $items['organizations/%'] = array(
-    'page callback' => '_organization',
+  $items['articles/%'] = array(
+    'page callback' => '_article',
     'page arguments' => array(1),
-    'access arguments' => array('administer site configuration'),
-    'file' => 'inc/organizations.culture.inc',
+    'access arguments' => array('access content'),
+    'file' => 'inc/articles.culture.inc',
     'type' => MENU_NORMAL_ITEM,
-  ); 
-
+  );
 
   //локали
   $items['reload-locales'] = array(
     'title' => 'Обновление списка локалей',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('locales_form'),
-    'access arguments' => array('administer site configuration'),
+    'access arguments' => array('access content'),
+    'file' => 'inc/reload.culture.inc',
+  );
+
+  //выбор региона
+  $items['set-region/%'] = array(
+    'page callback' => '_set_region',
+    'page arguments' => array(1),
+    'access arguments' => array('access content'),
+    'type' => MENU_NORMAL_ITEM,
+  ); 
+
+  //сайтмэп
+  $items['sitemap.txt'] = array(
+    'page callback' => '_main_sitemap',
+    'file' => 'inc/sitemap.inc',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK, 
+  );
+  $items['events.txt'] = array(
+    'page callback' => '_events_sitemap',
+    'file' => 'inc/sitemap.inc',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK, 
+  );
+  $items['places.txt'] = array(
+    'page callback' => '_places_sitemap',
+    'file' => 'inc/sitemap.inc',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK, 
+  );
+  $items['organizations.txt'] = array(
+    'page callback' => '_organizations_sitemap',
+    'file' => 'inc/sitemap.inc',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK, 
+  );
+  $items['search'] = array(
+    'page callback' => '_search_page',
+    'file' => 'inc/search.inc',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK, 
   );
 
   return $items;
@@ -74,15 +135,28 @@ function culture_menu() {
 function culture_theme() {
   return array(
 
+    //темплейт для страницы списка мест
+    'places' => array(
+      'variables' => array(
+        'title' => NULL,
+      ),
+      'template' => 'templates/places',
+    ),
+
     //темплейт для страницы места
     'place' => array(
       'variables' => array(
         'title' => NULL,
-        'address' => NULL,
-        'image' => NULL,
-        'description' => NULL,
       ),
       'template' => 'templates/place',
+    ),
+
+    //темплейт для страницы списка событий
+    'events' => array(
+      'variables' => array(
+        'title' => NULL,
+      ),
+      'template' => 'templates/events',
     ),
 
     //темплейт для страницы события
@@ -93,12 +167,28 @@ function culture_theme() {
       'template' => 'templates/event',
     ),
 
-    //темплейт для страницы организации
-    'organization' => array(
+    //темплейт для страниц статей
+    'articles' => array(
       'variables' => array(
         'title' => NULL,
       ),
-      'template' => 'templates/organization',
+      'template' => 'templates/articles',
+    ),
+
+    //темплейт для страницы статьи
+    'article' => array(
+      'variables' => array(
+        'title' => NULL,
+      ),
+      'template' => 'templates/article',
+    ),
+
+    //темплейт для страницы организации
+    'regionpage' => array(
+      'variables' => array(
+        'title' => NULL,
+      ),
+      'template' => 'templates/regionpage',
     ),
 
   );
@@ -112,6 +202,14 @@ function culture_block_info() {
     'info' => 'Блок выбора региона',
     'cache' => DRUPAL_NO_CACHE,
   );
+  $blocks['culture-search'] = array(
+    'info' => 'Поиск по событиям',
+    'cache' => DRUPAL_NO_CACHE,
+  );
+  $blocks['culture-menu'] = array(
+    'info' => 'Меню',
+    'cache' => DRUPAL_NO_CACHE,
+  );
   return $blocks;
 }
  
@@ -121,344 +219,81 @@ function culture_block_info() {
 function culture_block_view($delta = '') {
   $block = array();
   switch ($delta) {
-    case 'culture-region':
-      $block['subject'] = 'Выберите регион';
+    case 'culture-search':
+      $block['subject'] = 'Поиск';
       //рендерим форму выбора региона
-      $block['content'] = drupal_render(drupal_get_form('_select_region_form'));
-      drupal_add_library('system','jquery.cookie'); //добавляем куки, чтобы записать регион
+      $form = drupal_get_form('_search_form');
+      $block['content'] = array(
+        '#markup' => drupal_render($form),
+      );
+      break;
+
+    case 'culture-menu':
+      $block['subject'] = '';
+      //берём меню и правим его, если нужно
+      $region = (isset($_SESSION['region'])) ? $_SESSION['region'] : FALSE ;
+      $menu = menu_tree('main-menu');
+      foreach ($menu as $key => $value) {
+        if(isset($value['#href']) && $region){
+          $href = drupal_parse_url($value['#href']);
+          $path = explode('/', $href['path']);
+          if($path[0] == 'r' && $path[1]){
+            $path[1] = $region;
+          }
+          $menu[$key]['#href'] = implode('/', $path);
+        }
+      }
+
+      $block['content'] = render($menu);
       break;
   }
   return $block;
 }
 
-function _select_region_form($form, &$form_state){
-  $form = array();
-
-  $cookie = (isset($_COOKIE['region'])) ? $_COOKIE['region'] : 0 ;
-
-  $form['region'] = array(
-    '#type' => 'select',
-    '#options' => _get_regions_list(),
-    '#default_value' => $cookie,
-  );
-  
-  $form['region-cookies'] = array(
-    '#markup' => '<div id="region-cookies"></div>',
-  );
-
-  return $form;
+function _region_title($region_url){
+  $title = _get_region_term_from_url($region_url)->name;
+  return $title;
 }
 
-function _get_regions_list(){
-  $vid = taxonomy_vocabulary_machine_name_load('locales')->vid;
-  $term_rf = taxonomy_get_term_by_name('РФ');
-  
-  foreach ($term_rf as $value) {
-    $tid_rf = $value->tid;
-    $name_rf = 'Вся Россия';
-  }
-  $childrens = taxonomy_get_children($tid_rf, $vid);
-
-  $output = array();
-  $output[$tid_rf] = $name_rf;
-  foreach ($childrens as $key => $value) {
-    $output[$key] = $value->name;
-  }
-
-  return $output;
-}
-
-function _pager($total){
-  //pager
-  $per_page = 20;
-  $elements_count = $total;
-  // Initialize the pager
-  $current_page = pager_default_initialize($elements_count, $per_page);
-  // Show the pager
-  $pager = theme('pager', array('quantity', $elements_count));
-
-  return $pager;
-}
-
-function _decode($url, $region = TRUE){
-
-  //для пейджера
-  $data_arr = array();
-  if(isset($_GET['page'])){
-    $offset = $_GET['page']*20;
-    $data_arr[] = 'offset='.$offset;
-  }
-
-  $term_rf = taxonomy_get_term_by_name('РФ');
-  foreach ($term_rf as $value) {
-    $tid_rf = $value->tid;
-  }
-
-  if($region && isset($_COOKIE['region'])){
-    if ($_COOKIE['region'] != $tid_rf) {
-      $childrens = taxonomy_get_children($_COOKIE['region']);
-      
-      $children = array();
-      //$children[] = $_COOKIE['region'];
-      foreach ($childrens as $key => $value) {
-        $children[] = $value->field_locales_id['und'][0]['value'];
-      }
-      $data_arr[] = 'locales='.implode(',', $children);
+/**
+ * Implements hook_taxonomy_term_view().
+ */
+function culture_taxonomy_term_view($term, $view_mode, $langcode){
+  $childrens = '';
+  $childrens_array = taxonomy_get_children($term->tid);
+  if(sizeof($childrens_array) > 0){
+    $header = array('Регион', 'Id');
+    foreach ($childrens_array as $key => $children) {
+      $rows[$key][] = l($children->name, 'taxonomy/term/' . $children->tid);
+      $rows[$key][] = $children->field_locales_id['und'][0]['value'];
     }
+    $table = theme('table', array(
+      'header' => $header, 
+      'rows' => $rows, 
+    ));
   }
-
-  $data = (sizeof($data_arr) > 0) ? implode('&', $data_arr) : NULL;
-
-  $options = array(
-    'method' => 'GET',
-    'data' => $data,
-    'timeout' => 15,
-    'headers' => array('Content-Type' => 'application/x-www-form-urlencoded'),
+  else{
+    $table = 'Дочерних регионов не найдено';
+  }
+  $term->content['childrens'] = array(
+    '#markup' => $table,
+    '#weight' => 10,
   );
-  $result = drupal_http_request($url, $options);
-
-  $decode = json_decode($result->data);
-
-  //dsm($decode);
-  return $decode;
 }
 
-//формирует список тэгов
-function _tags($tags_array){
-  $tags = array();
-  foreach ($tags_array as $key => $value) {
-    $tags[] = l($value->name, 'tags/'.$value->_id);
+// template_preprocess_node(&$variables)
+function culture_preprocess_page(&$variables){
+  $variables['region_text'] = 1;
+  $region = (isset($_SESSION['region'])) ? $_SESSION['region'] : FALSE;
+  $choose_region = ' (' . l('Выберите регион', '<front>') . ')';
+  if($region){
+    $region_term = _get_region_term_from_url($region);
+    $region_name = l($region_term->name, 'r/' . $region);
+
+    $variables['region_text'] = $region_name . $choose_region;
   }
-  $output = (sizeof($tags) > 0) ? 'Тэги: '.implode(', ', $tags) : '';
-  
-  return $output;
+  else{
+    $variables['region_text'] = 'Регион не выбран' . $choose_region;
+  }
+  dsm($_SESSION);
 }
-
-//формирует список контактов из полученного массива
-function _contacts($contacts_array){
-  $items = array();
-  if (isset($contacts_array->website)) {
-    $items[] = 'Официальный сайт: <a href="' . $contacts_array->website . '" target="_blank">'.$contacts_array->website.'</a>';
-  }
-  if (isset($contacts_array->phones)) {
-    foreach ($contacts_array->phones as $phone) {
-      $comment = ($phone->comment != '') ? ' ('.$phone->comment.')' : '' ;
-      $items[] = _format_phone($phone->value) . $comment;
-    }
-  }
-
-  $output = (sizeof($items) > 0) ? 'Контакты: '.theme('item_list', array('items' => $items)) : '' ;
-
-  return $output;
-}
-
-//выводим расписание работы
-function _schedule($schedule){
-  $output = '';
-  $days = array('Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье');
-  $items = array();
-  $minus = 9 * 60 * 60; //сколько вычест часов, чтобы получить нормальное время
-  dsm($schedule);
-  foreach ($schedule as $key => $value) {
-    $from = date("H:i", (int) $value->from / 1000 - 3*60*60);
-    $to = date("H:i", (int) $value->to / 1000 - 3*60*60);
-
-    dsm($to);
-    $items[] = $days[$key] . ': '.$from. ' - ' . $to;
-  }
-
-  $output = (sizeof($items) > 0) ? 'Время работы: '.theme('item_list', array('items' => $items)) : '' ; 
-
-  return $output;
-}
-
-//функция, которая отдаёт карту с точкой в заданных координатах
-function _map($coordinateX, $coordinateY, $hint, $baloon){
-  drupal_add_js('https://api-maps.yandex.ru/2.1/?lang=ru_RU', 'external');
-  drupal_add_js('
-      ymaps.ready(init);
-        var myMap,
-            myPlacemark;
-
-        function init(){     
-            myMap = new ymaps.Map("map", {
-                center: ['.$coordinateX.', '.$coordinateY.'],
-                zoom: 12
-            });
-
-            myPlacemark = new ymaps.Placemark(['.$coordinateX.', '.$coordinateY.'], { 
-                hintContent: "'.$hint.'", 
-                balloonContent: "'.$baloon.'" 
-            });
-
-            myMap.geoObjects.add(myPlacemark);
-        }
-  ', array('type' => 'inline', 'scope' => 'footer', 'weight' => 5));
-
-  $output = '<div id="map" style="width: 600px; height: 400px"></div>';
-  return $output;
-}
-
-//форматирует номер телефона
-function _format_phone($phone = '', $convert = false, $trim = true){
-  // If we have not entered a phone number just return empty
-  if (empty($phone)) {
-    return '';
-  }
-
-  // Strip out any extra characters that we do not need only keep letters and numbers
-  $phone = preg_replace("/[^0-9A-Za-z]/", "", $phone);
-
-  // Do we want to convert phone numbers with letters to their number equivalent?
-  // Samples are: 1-800-TERMINIX, 1-800-FLOWERS, 1-800-Petmeds
-  if ($convert == true) {
-    $replace = 
-      array(
-        '2'=>array('a','b','c'),
-        '3'=>array('d','e','f'),
-        '4'=>array('g','h','i'),
-        '5'=>array('j','k','l'),
-        '6'=>array('m','n','o'),
-        '7'=>array('p','q','r','s'),
-        '8'=>array('t','u','v'), 
-        '9'=>array('w','x','y','z')
-      );
-
-    // Replace each letter with a number
-    // Notice this is case insensitive with the str_ireplace instead of str_replace 
-    foreach($replace as $digit=>$letters) {
-      $phone = str_ireplace($letters, $digit, $phone);
-    }
-  }
-
-  // If we have a number longer than 11 digits cut the string down to only 11
-  // This is also only ran if we want to limit only to 11 characters
-  if ($trim == true && strlen($phone)>11) {
-    $phone = substr($phone,  0, 11);
-  } 
-
-  // Perform phone number formatting here
-  if (strlen($phone) == 7) {
-    return preg_replace("/([0-9a-zA-Z]{3})([0-9a-zA-Z]{4})/", "$1-$2", $phone);
-  } elseif (strlen($phone) == 10) {
-    return preg_replace("/([0-9a-zA-Z]{3})([0-9a-zA-Z]{3})([0-9a-zA-Z]{4})/", "($1) $2-$3", $phone);
-  } elseif (strlen($phone) == 11) {
-    return preg_replace("/([0-9a-zA-Z]{1})([0-9a-zA-Z]{3})([0-9a-zA-Z]{3})([0-9a-zA-Z]{4})/", "$1($2) $3-$4", $phone);
-  }
-
-  // Return original phone if not 7, 10 or 11 digits long
-  return $phone;
-}
-
-
-function locales_form($form, &$form_state){
-
-  $form = array();
-
-  $form['submit'] = array(
-    '#type' => 'submit',
-    '#value' => 'Начать обновление',
-  );
-
-  return $form;
-}
-
-function locales_form_submit($form, &$form_state){
-
-  $vid = taxonomy_vocabulary_machine_name_load('locales')->vid;
-
-  //формируем массив всех локалей. за один раз получать можно только 1000 локалей
-  $total_url = 'http://all.culture.ru/api/1.0/locales?limit=1';
-
-  $total = _decode($total_url, FALSE)->total;
-
-  $operations = array();
-  for($i = 0; $i < $total; $i++){
-    $operations[] = array('reload_taxonomy_locale_term', array($vid));
-  }
-
-  $batch = array(
-    // Массив операций и их параметров
-    'operations' => $operations,
-    // Функция, которая будет выполнена после окончания всех операций
-    'finished' => 'locale_batch_finished',
-    // Заголовок страницы с прогресс баром.
-    // Опционально, по умолчанию t('Processing')
-    'title' => 'Обновление терминов таксономии',
-    // Сообщение, показываемое при инициализации.
-    // Опционально, по умолчанию t('Initializing.')
-    'init_message' => 'Подготовка данных',
-    // Сообщение, показывемое при выполнении операций.
-    // Опционально, по умолчанию t('Completed @current of @total.')
-    'progress_message' => 'Выполнено @current из @total.',
-    // Сообщение показываемое при ошибке выполнения операции.
-    // Опционально, по умолчанию t('An error has occurred.')
-    'error_message' => 'Произошла ошибка.',
-  );
-
-  batch_set($batch);
-
-}
-
-function reload_taxonomy_locale_term($vid, &$context) {
-
-  $offset = sizeof($context['results']);
-
-  $url = 'http://all.culture.ru/api/1.0/locales?limit=1&offset='.$offset;
-  $options = array(
-    'method' => 'GET',
-    'timeout' => 15,
-    'headers' => array('Content-Type' => 'application/x-www-form-urlencoded'),
-  );
-  $result = drupal_http_request($url, $options);
-  $decode = json_decode($result->data);
-
-  $parent = 0;
-
-  $term = array(
-    'vid' => $vid,
-    'name' => $decode->locales[0]->name,
-  );
-
-  $term = (object) $term;
-
-  $term_id = db_select('field_data_field_locales_id', 'lid')
-    ->fields('lid', array('entity_id'))
-    ->condition('lid.field_locales_id_value', $decode->locales[0]->_id)
-    ->execute()
-    ->fetchField();
-
-  //записываем термин только в том случае, если такого ещё нет в базе данных
-  if(!$term_id) {
-    taxonomy_term_save($term);   
-
-    $parent_id = db_select('field_data_field_locales_id', 'lid')
-      ->fields('lid', array('entity_id'))
-      ->condition('lid.field_locales_id_value', $decode->locales[0]->parentId)
-      ->execute()
-      ->fetchField();
-    $parent = ($parent_id == '') ? 0 : $parent_id;
-    
-    $term->field_locales_id['und'][0]['value'] = $decode->locales[0]->_id;
-    $term->field_locales_timezone['und'][0]['value'] = $decode->locales[0]->timezone;
-    $term->parent[0] = $parent;
-    taxonomy_term_save($term);
-  }
-
-  $context['results'][] = 'good';
-
-  // Сообщение выводимое под прогресс баром после окончания текущей операции
-  //$context['message'] = $vid;
-  //$context['results'][] = $vid;
-}
-
-function locale_batch_finished($success, $results, $operations) {
-  if ($success) {
-    drupal_set_message('Затронуто ' . count($results) . ' материалов:');
-    dsm($results);
-  }
-  else {
-    drupal_set_message('Завершено с ошибками.', 'error');
-  }
-}
-
